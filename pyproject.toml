@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shbin"
+description = "Upload content to your pastebin repo"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "BSD 3-Clause License"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "pygithub",
+]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "shbin.VERSION"}
+
+[project.scripts]
+shbin = "shbin:main"
