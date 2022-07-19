@@ -4,7 +4,9 @@ A tiny tool to upload any snippets, notebooks or any other content easily to our
 
 # Install
 
-- $ pip --user install git+ssh://git@github.com/Shiphero/shbin.git
+```
+pip --user install git+ssh://git@github.com/Shiphero/shbin.git
+```
 
 - Create a new [personal token](https://github.com/settings/tokens). Follow [these instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for details. Make sure of:
     
