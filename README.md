@@ -1,5 +1,9 @@
 # SHBin
 
+![](https://github.com/Shiphero/shbin/actions/workflows/pytest.yml/badge.svg)
+![](https://github.com/Shiphero/shbin/actions/workflows/black.yml/badge.svg)
+
+
 A tiny tool to upload any snippets, notebooks or any other content easily to our [internal pastebin repo](https://github.com/Shiphero/pastebin).
 
 # Install
@@ -21,7 +25,8 @@ pipx install  git+ssh://git@github.com/Shiphero/shbin.git
     export SHBIN_GITHUB_TOKEN = "<your personal token>"
     export SHBIN_REPO = "Shiphero/pastebin" 
     ```
-- [optionally] Install xclip. For example in Ubuntu/Debian
+- [optionally] Install xclip to be able to copy from your clipboard. For example in Ubuntu/Debian
+  
   
   ```console
   $ sudo apt install xclip
@@ -32,12 +37,16 @@ pipx install  git+ssh://git@github.com/Shiphero/shbin.git
 ```console
 $ shbin demo.py -m "something cool to share"         
 
-# upload content from the clipboard, discovering its format. e.g. an screenshot
-$ shbin -x           
+# upload content from the clipboard, discovering its format. e.g. an screenshot. 
+# the name will be random
+$ shbin -x          
+
+# from clipboard with a given name
+$ shbin -x -o the_coolest_thing.py
+
 
 # upload several files in a directory
 $ shbin *.ipynb *.csv -o notebooks/project -m "my new work"   
-
 
 $ shbin -h   # show full options
 ```
