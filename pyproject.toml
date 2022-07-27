@@ -1,23 +1,44 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "shbin"
-description = "Upload content to your pastebin repo"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "BSD 3-Clause License"}
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
-dependencies = [
-    "pygithub",
+authors = [
+    {name = "Alvar Maciel", email = "alvar.maciel@shiphero.com"}, 
+    {name = "Martín Gaitán", email = "marting@shiphero.com"}
 ]
-dynamic = ["version"]
-
-[tool.setuptools.dynamic]
-version = {attr = "shbin.VERSION"}
+dependencies = [
+    "pygithub >= 1.55",
+    # pyclip with this patch https://github.com/spyoungtech/pyclip/pull/21
+    "pyclip @ https://github.com/mgaitan/pyclip/archive/refs/heads/best_binary.zip",
+    "python-magic >= 0.4.3",
+    "docopt-ng >= 0.8.1",
+    "rich >= 12.5",
+]
+dynamic = ["version", "description"]
 
 [project.scripts]
 shbin = "shbin:main"
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black"
+]
+
+[tool.ipdb]
+context=5
+
+
+[tool.black]
+line-length = 120
+target-version = ["py37"]
+color = true

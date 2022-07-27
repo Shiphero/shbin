@@ -7,7 +7,8 @@ A tiny tool to upload any snippets, notebooks or any other content easily to our
 - Install the package
 
 ```
-pip install --user git+ssh://git@github.com/Shiphero/shbin.git
+pip install --user pipx
+pipx install  git+ssh://git@github.com/Shiphero/shbin.git
 ```
 
 - Create a new [personal token](https://github.com/settings/tokens). Follow [these instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for details. Make sure of:
@@ -22,16 +23,21 @@ pip install --user git+ssh://git@github.com/Shiphero/shbin.git
     ```
 - [optionally] Install xclip. For example in Ubuntu/Debian
   
-  ```
+  ```console
   $ sudo apt install xclip
   ```
 
 # Usage
 
-```
-$ shbin <file>
-$ shbin  # upload content from the clipboard, discovering its format. e.g. an screenshot
-$ shbin <file> -u -m "your message"   # update a file and add a commit message
-$ shbin <file1> <file2> [...]         # upload several files  
+```console
+$ shbin demo.py -m "something cool to share"         
+
+# upload content from the clipboard, discovering its format. e.g. an screenshot
+$ shbin -x           
+
+# upload several files in a directory
+$ shbin *.ipynb *.csv -o notebooks/project -m "my new work"   
+
+
 $ shbin -h   # show full options
 ```

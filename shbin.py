@@ -1,134 +1,159 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Upload a file to your own folder on the pastebin repo.
+"""Upload content to your pastebin repo"""
+usage = """
 
-# Install
+Usage:
+  shbin (-h | --help)
+  shbin (<path>... | -x ) [-n] [-m <message>] [-o <target_path>]
 
-- Save this file somewhere in your PATH as "shbin", and add execution permissions. 
 
-  `$ chmod -x /path/to/shbin`
-
-- Create a personal token from https://github.com/settings/tokens
-
-  Follow these instructions for details https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-  Make sure of:
-    
-    - Enable Repo and User scopes
-    - Enable SSO
-
-- Set the environment variable:
-
-    export SHBIN_GITHUB_TOKEN = "<your personal token>"
-
-- Install pygithub
-
-  ```
-  $pip --user install pygithub
-  ```
-
-- [optionally] Install xclip. For example in Ubuntu/Debian
+Options:
+  -h --help                                 Show this screen.
+  -x --from-clipboard                       Paste content from clipboard instead file/s
+  -m <message>, --message=<message>         Commit message
+  -o <target>, --target=<target>            Optional filename or directory to upload file/s
+  -n --new                                  Create a new file if the given already exists
   
-  ```
-  $ sudo apt install xclip
-  ```
-
-# Usage
-
-```
-$ shbin <file>
-$ shbin  # upload content from the clipboard, discovering its format. e.g. an screenshot
-
-$ shbin <file> -u -m "your message"   # update a file and add a commit message
-$ shbin <file1> <file2> [...]         # upload several files  
-$ shbin -h   # show full options
-```
 """
 
-import argparse
+import itertools
 import os
 import pathlib
 import secrets
-import subprocess
 import sys
+from mimetypes import guess_extension
 
+import magic
+import pyclip
+from docopt import DocoptExit, docopt
 from github import Github, GithubException
+from rich import print
+from rich.prompt import Confirm
 
-VERSION = "0.1.0"
-
-
-def valid_path(path_str):
-    path = pathlib.Path(path_str)
-    if not path.exists() or not path.is_file():
-        raise argparse.ArgumentTypeError(f"{path_str} is not a valid file")
-    return path
+__version__ = "0.1"
 
 
-def init_argparse() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="upload a file to your folder on pastebin repo",
-    )
-    parser.add_argument("files", nargs="*", type=valid_path)
-    parser.add_argument("-m", "--message", help="Message for the commit", default="")
-    parser.add_argument("-f", "--suffix", help="Extension for plain text", default="md")
-    parser.add_argument("-u", "--update", default="Update file if it exists")
-    parser.add_argument(
-        "--repo",
-        default=os.environ.get("SHBIN_REPO", "shiphero/pastebin"),
-        help="REPO to commit",
-    )
-    parser.add_argument(
-        "--gh-token",
-        default=os.environ.get("SHBIN_GITHUB_TOKEN"),
-        help="Github Personal access token",
-    )
-    return parser
+class FakePath:
+    """
+    A wrapper on a PurePath object (ie it doesn’t actually access a filesystem)
+    with an explicity content in bytes.
+    """
+
+    def __init__(self, *args, content=b""):
+        self._path = pathlib.PurePath(*args)
+        self._content = content
+
+    def read_bytes(self):
+        return self._content
+
+    def __getattr__(self, attr):
+        return getattr(self._path, attr)
 
 
-def main() -> None:
+def get_repo_and_user():
+    gh = Github(os.environ["SHBIN_GITHUB_TOKEN"])
+    return gh.get_repo(os.environ["SHBIN_REPO"]), gh.get_user().login
 
-    parser = init_argparse()
-    args = parser.parse_args()
-    gh = Github(args.gh_token)
 
-    repo = gh.get_repo(args.repo)
-    user = gh.get_user().login
+def expand_paths(path_or_patterns):
+    """
+    receive a list of relative paths or glob patterns and return an iterator of Path instances
+    """
+    patterns = []
+    for path_or_pattern in path_or_patterns:
+        if str(path_or_pattern).startswith("/"):
+            # if it's absolute, we assume it's a path
+            patterns.append([pathlib.Path(path_or_pattern)])
+        else:
+            patterns.append(pathlib.Path(".").glob(path_or_pattern))
 
-    if not args.files:
-        # if no files were given, try to read from clipboard using xclip
-        base_command = ["xclip", "-o", "-selection", "clipboard", "-t"]
+    return itertools.chain.from_iterable(patterns)
 
-        targets = subprocess.check_output(base_command + ["TARGETS"], text=True).splitlines()
-        mime_type = "text/plain" if "text/plain" in targets else targets[0]
 
-        content = subprocess.check_output(base_command + [mime_type])
+def main(argv=None) -> None:
+    args = docopt(__doc__ + usage, argv, version=__version__)
+    try:
+        repo, user = get_repo_and_user()
+    except Exception as e:
+        raise DocoptExit(
+            f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
+        )
 
-        suffix = args.suffix if mime_type == "text/plain" else mime_type.split("/")[-1]
-        # TODO detect language via pygments
+    if args["--from-clipboard"]:
+        try:
+            content = pyclip.paste()
+        except pyclip.ClipboardSetupException as e:
+            raise DocoptExit(str(e))
 
-        path_name = f"{secrets.token_urlsafe(8)}.{suffix}"
-        result = repo.create_file(f"{user}/{path_name}", args.message, content)
-        print(result["content"].html_url)
-        return
+        if args["--target"]:
+            directory, path_name = pathlib.PurePath(args["--target"]).parts
+            directory = f"{user}/{directory}"
+        else:
+            extension = guess_extension(magic.from_buffer(content, mime=True))
+            # TODO try autodectect extension via pygment if .txt was guessed.
+            path_name = f"{secrets.token_urlsafe(8)}{extension}"
+            directory = f"{user}"
+        files = [FakePath(path_name, content=content)]
+        
+    else:
+        files = list(expand_paths(args["<path>"]))
+        dir_target = args["--target"] or ""
 
-    for path in args.files:
+        if (
+            files
+            and pathlib.PurePath(dir_target).suffix
+            and not Confirm.ask(
+                "--output looks like a file, not a directory. Are you sure?"
+            )
+        ):
+            raise SystemExit(f"🚪 ok, see you soon")
+
+        directory = f"{user}/{dir_target}".rstrip("/")
+
+    message = args["--message"] or ""
+
+    for path in files:
         file_content = path.read_bytes()
 
         try:
-            result = repo.create_file(f"{user}/{path.name}", args.message, file_content)
+            result = repo.create_file(f"{directory}/{path.name}", message, file_content)
         except GithubException:
-            # file already exist
-            if args.update:
-                contents = repo.get_contents(f"{user}/{path.name}")
-                print(f"{path.name} already exists. Updating it.", file=sys.stderr)
-                result = repo.update_file(f"{user}/{path.name}", args.message, file_content, contents.sha)
-                print(result["content"].html_url)
-            else:
+            # file already exists
+            if args["--new"]:
                 new_path = f"{path.stem}_{secrets.token_urlsafe(8)}{path.suffix}"
-                print(f"{path.name} already exists. Creating {new_path}.", file=sys.stderr)
-                result = repo.create_file(f"{user}/{new_path}", args.message, file_content)
+                print(
+                    f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Creating as {new_path}.",
+                    file=sys.stderr,
+                )
+                result = repo.create_file(
+                    f"{directory}/{new_path}", message, file_content
+                )
 
-        print(f"{repo.html_url}/blob/{result['commit'].sha}/{result['content'].path}")
+            else:
+                # TODO upload all the files in a single commit
+                contents = repo.get_contents(f"{directory}/{path.name}")
+                print(
+                    f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Updating it.",
+                    file=sys.stderr,
+                )
+                result = repo.update_file(
+                    f"{directory}/{path.name}", message, file_content, contents.sha
+                )
+
+    if not files:
+        print("🤷 [bold]no file was uploaded[/bold]")
+    else:
+        url = (
+            result["content"].html_url.rpartition("/")[0]
+            if len(files) > 1
+            else result["content"].html_url
+        )
+        emoji = "🔗"
+        try:
+            pyclip.copy(str(url))
+            emoji += "📋"
+        except pyclip.ClipboardSetupException:
+            pass
+        print(f"{emoji} {url}")
 
 
 if __name__ == "__main__":
