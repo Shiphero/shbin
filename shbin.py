@@ -93,7 +93,7 @@ def main(argv=None) -> None:
             path_name = f"{secrets.token_urlsafe(8)}{extension}"
             directory = f"{user}"
         files = [FakePath(path_name, content=content)]
-        
+
     else:
         files = list(expand_paths(args["<path>"]))
         dir_target = args["--target"] or ""
@@ -101,9 +101,7 @@ def main(argv=None) -> None:
         if (
             files
             and pathlib.PurePath(dir_target).suffix
-            and not Confirm.ask(
-                "--output looks like a file, not a directory. Are you sure?"
-            )
+            and not Confirm.ask("--output looks like a file, not a directory. Are you sure?")
         ):
             raise SystemExit(f"🚪 ok, see you soon")
 
@@ -124,9 +122,7 @@ def main(argv=None) -> None:
                     f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Creating as {new_path}.",
                     file=sys.stderr,
                 )
-                result = repo.create_file(
-                    f"{directory}/{new_path}", message, file_content
-                )
+                result = repo.create_file(f"{directory}/{new_path}", message, file_content)
 
             else:
                 # TODO upload all the files in a single commit
@@ -135,18 +131,12 @@ def main(argv=None) -> None:
                     f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Updating it.",
                     file=sys.stderr,
                 )
-                result = repo.update_file(
-                    f"{directory}/{path.name}", message, file_content, contents.sha
-                )
+                result = repo.update_file(f"{directory}/{path.name}", message, file_content, contents.sha)
 
     if not files:
         print("🤷 [bold]no file was uploaded[/bold]")
     else:
-        url = (
-            result["content"].html_url.rpartition("/")[0]
-            if len(files) > 1
-            else result["content"].html_url
-        )
+        url = result["content"].html_url.rpartition("/")[0] if len(files) > 1 else result["content"].html_url
         emoji = "🔗"
         try:
             pyclip.copy(str(url))

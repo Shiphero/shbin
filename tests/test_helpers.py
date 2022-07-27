@@ -17,17 +17,20 @@ def a_dir(monkeypatch, tmp_path):
     for f in "abc":
         (tmp_path / f"{f}.py").touch()
     (tmp_path / "smile.png").touch()
-    (tmp_path / "subdir").mkdir() 
+    (tmp_path / "subdir").mkdir()
     (tmp_path / "subdir/readme.txt").touch()
     return tmp_path
 
 
-@pytest.mark.parametrize('given, expected', [
-    (["*.py"], {"a.py", "b.py", "c.py"}),
-    (["smile.png"], {"smile.png"}),
-    (["a.py", "smile.png"], {"smile.png", "a.py"}),
-    (["smile.png", "subdir/*"], {"smile.png", "subdir/readme.txt"}),
-])
+@pytest.mark.parametrize(
+    "given, expected",
+    [
+        (["*.py"], {"a.py", "b.py", "c.py"}),
+        (["smile.png"], {"smile.png"}),
+        (["a.py", "smile.png"], {"smile.png", "a.py"}),
+        (["smile.png", "subdir/*"], {"smile.png", "subdir/readme.txt"}),
+    ],
+)
 def test_expand_path_with_relative_patterns(given, expected, a_dir):
     assert {str(path) for path in expand_paths(given)} == expected
 

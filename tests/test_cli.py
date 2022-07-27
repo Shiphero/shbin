@@ -119,18 +119,14 @@ def test_upload_file_with_target(tmp_path, patched_repo_and_user, repo, target):
     repo.create_file.assert_called_once_with(f"messi/{target.rstrip('/')}/hello.md", "", b"hello")
 
 
-def test_upload_file_with_target_as_file_confirm(
-    tmp_path, patched_repo_and_user, repo, confirm_yes
-):
+def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user, repo, confirm_yes):
     file = tmp_path / "hello.md"
     file.write_text("hello")
     main([str(file), "-o", "bye.md"])
     repo.create_file.assert_called_once_with("messi/bye.md/hello.md", "", b"hello")
 
 
-def test_upload_file_with_target_as_file_cancel(
-    tmp_path, patched_repo_and_user, repo, confirm_no
-):
+def test_upload_file_with_target_as_file_cancel(tmp_path, patched_repo_and_user, repo, confirm_no):
     file = tmp_path / "hello.md"
     file.write_text("hello")
     with pytest.raises(SystemExit) as e:
@@ -177,6 +173,7 @@ def test_png_from_clipboard(pyclip, patched_repo_and_user, repo, capsys):
     assert pyclip.paste() == "https://the-url"
     assert capsys.readouterr().out == "🔗📋 https://the-url\n"
 
+
 def test_from_clipboard_with_name(pyclip, patched_repo_and_user, repo, capsys):
     pyclip.copy(b"data")
     main(["-x", "-o", "foo/data.md"])
@@ -197,10 +194,13 @@ def test_simple_update(pyclip, tmp_path, patched_repo_and_user, repo):
 
 
 def test_force_new(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
-    repo.create_file.side_effect = [GithubException(400, data="", headers=None), {"content": Mock(html_url="https://the-url-2")}]
+    repo.create_file.side_effect = [
+        GithubException(400, data="", headers=None),
+        {"content": Mock(html_url="https://the-url-2")},
+    ]
     file = tmp_path / "hello.md"
     file.write_bytes(b"hello")
-    
+
     with patch("shbin.secrets.token_urlsafe", return_value="abc"):
         main([str(file), "-n"])
     assert repo.create_file.call_count == 2
