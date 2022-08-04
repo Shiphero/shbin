@@ -71,7 +71,6 @@ def expand_paths(path_or_patterns):
 
 
 def main(argv=None) -> None:
-    import ipdb;ipdb.set_trace()
     args = docopt(__doc__ + usage, argv, version=__version__)
     try:
         repo, user = get_repo_and_user()
