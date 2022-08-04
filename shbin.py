@@ -11,7 +11,7 @@ Options:
   -x --from-clipboard                       Paste content from clipboard instead file/s
   -f <file-name>, --file-name=<file-name>   Add name to content of clipboard
   -m <message>, --message=<message>         Commit message
-  -o <target>, --target=<target>            Optional filename or directory to upload file/s
+  -o <target>, --target=<target>            Optional directory to upload file/s
   -n --new                                  Create a new file if the given already exists
   
 """
@@ -71,6 +71,7 @@ def expand_paths(path_or_patterns):
 
 
 def main(argv=None) -> None:
+    import ipdb;ipdb.set_trace()
     args = docopt(__doc__ + usage, argv, version=__version__)
     try:
         repo, user = get_repo_and_user()
@@ -86,14 +87,14 @@ def main(argv=None) -> None:
             raise DocoptExit(str(e))
 
         if args["--file-name"]:
-            directory, path_name = pathlib.PurePath(args["--file-name"]).parts
-            directory = f"{user}/{directory}"
+            file_name = f'{args["--file-name"]}'
+            directory = f"{user}"
         else:
             extension = guess_extension(magic.from_buffer(content, mime=True))
             # TODO try autodectect extension via pygment if .txt was guessed.
             path_name = f"{secrets.token_urlsafe(8)}{extension}"
             directory = f"{user}"
-        files = [FakePath(path_name, content=content)]
+        files = [FakePath(file_name , content=content)]
 
     else:
         files = list(expand_paths(args["<path>"]))
