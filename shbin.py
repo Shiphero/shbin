@@ -92,7 +92,7 @@ def main(argv=None) -> None:
             directory = pathlib.PurePath(args["--target"])
             extension = guess_extension(magic.from_buffer(content, mime=True))
             # TODO try autodectect extension via pygment if .txt was guessed.
-            file_name = f"{secrets.token_urlsafe(8)}{extension}"
+            file_name = f'{args["--file-name"]}'
             directory = f"{user}/{directory}"
         else:
             extension = guess_extension(magic.from_buffer(content, mime=True))
