@@ -85,15 +85,21 @@ def main(argv=None) -> None:
         except pyclip.ClipboardSetupException as e:
             raise DocoptExit(str(e))
 
-        if args["--file-name"]:
+        if args["--file-name"] and not args["--target"]:
             file_name = f'{args["--file-name"]}'
             directory = f"{user}"
+        elif args["--target"]:
+            directory = pathlib.PurePath(args["--target"])
+            extension = guess_extension(magic.from_buffer(content, mime=True))
+            # TODO try autodectect extension via pygment if .txt was guessed.
+            file_name = f"{secrets.token_urlsafe(8)}{extension}"
+            directory = f"{user}/{directory}"
         else:
             extension = guess_extension(magic.from_buffer(content, mime=True))
             # TODO try autodectect extension via pygment if .txt was guessed.
-            path_name = f"{secrets.token_urlsafe(8)}{extension}"
+            file_name = f"{secrets.token_urlsafe(8)}{extension}"
             directory = f"{user}"
-        files = [FakePath(file_name , content=content)]
+        files = [FakePath(file_name, content=content)]
 
     else:
         files = list(expand_paths(args["<path>"]))
