@@ -42,7 +42,10 @@ $ shbin demo.py -m "something cool to share"
 $ shbin -x          
 
 # from clipboard with a given name
-$ shbin -x -o the_coolest_thing.py
+$ shbin -x -f the_coolest_thing.py
+
+# from clipboard with a given name to a directory in your user directory
+$ shbin -x -f the_coolest_thing.py -o coolest_things/python
 
 
 # upload several files in a directory
