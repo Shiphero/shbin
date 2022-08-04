@@ -3,12 +3,13 @@ usage = """
 
 Usage:
   shbin (-h | --help)
-  shbin (<path>... | -x ) [-n] [-m <message>] [-o <target_path>]
+  shbin (<path>... | -x [-f <file-name>]) [-n] [-m <message>] [-o <target_path>]
 
 
 Options:
   -h --help                                 Show this screen.
   -x --from-clipboard                       Paste content from clipboard instead file/s
+  -f <file-name>, --file-name=<file-name>   Add name to content of clipboard
   -m <message>, --message=<message>         Commit message
   -o <target>, --target=<target>            Optional filename or directory to upload file/s
   -n --new                                  Create a new file if the given already exists
@@ -84,8 +85,8 @@ def main(argv=None) -> None:
         except pyclip.ClipboardSetupException as e:
             raise DocoptExit(str(e))
 
-        if args["--target"]:
-            directory, path_name = pathlib.PurePath(args["--target"]).parts
+        if args["--file-name"]:
+            directory, path_name = pathlib.PurePath(args["--file-name"]).parts
             directory = f"{user}/{directory}"
         else:
             extension = guess_extension(magic.from_buffer(content, mime=True))

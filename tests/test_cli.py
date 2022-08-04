@@ -176,7 +176,7 @@ def test_png_from_clipboard(pyclip, patched_repo_and_user, repo, capsys):
 
 def test_from_clipboard_with_name(pyclip, patched_repo_and_user, repo, capsys):
     pyclip.copy(b"data")
-    main(["-x", "-o", "foo/data.md"])
+    main(["-x", "-f", "foo/data.md"])
     repo.create_file.assert_any_call("messi/foo/data.md", "", b"data")
     # the url was copied
     assert pyclip.paste() == "https://the-url"
