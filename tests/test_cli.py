@@ -182,14 +182,14 @@ def test_from_clipboard_with_name(pyclip, patched_repo_and_user, repo, capsys):
     assert pyclip.paste() == "https://the-url"
     assert capsys.readouterr().out == "🔗📋 https://the-url\n"
 
-def test_from_clipboard_with_name_and_directory( pyclip, patched_repo_and_user, repo, capsys):
+
+def test_from_clipboard_with_name_and_directory(pyclip, patched_repo_and_user, repo, capsys):
     pyclip.copy(b"data")
     main(["-x", "-f", "data.md", "-o", "foo"])
     repo.create_file.assert_any_call("messi/foo/data.md", "", b"data")
     # the url was copied
     assert pyclip.paste() == "https://the-url"
     assert capsys.readouterr().out == "🔗📋 https://the-url\n"
-
 
 
 def test_simple_update(pyclip, tmp_path, patched_repo_and_user, repo):
