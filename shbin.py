@@ -20,10 +20,9 @@ import os
 import pathlib
 import secrets
 import sys
-from mimetypes import guess_extension
-
-import magic
 import pyclip
+
+from mimetypes import guess_extension
 from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
@@ -69,6 +68,20 @@ def expand_paths(path_or_patterns):
     return itertools.chain.from_iterable(patterns)
 
 
+def get_extension(content):
+    try:
+        import magic
+    except ImportError as e:
+        print(
+            f"[bold yellow]warning:[/bold yellow] check the README to correctly install python-magic. Import Error: {e}"
+        )
+        return ""
+        # Optionally could we detect a few formats in our own?
+        # for instance, images are easy https://stackoverflow.com/a/27670182/811740
+    else:
+        return guess_extension(magic.from_buffer(content, mime=True))
+
+
 def main(argv=None) -> None:
     args = docopt(__doc__ + usage, argv, version=__version__)
     try:
@@ -88,7 +101,7 @@ def main(argv=None) -> None:
             directory, path_name = pathlib.PurePath(args["--target"]).parts
             directory = f"{user}/{directory}"
         else:
-            extension = guess_extension(magic.from_buffer(content, mime=True))
+            extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
             path_name = f"{secrets.token_urlsafe(8)}{extension}"
             directory = f"{user}"
