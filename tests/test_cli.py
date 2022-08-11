@@ -47,17 +47,6 @@ def patched_repo_and_user(repo):
         yield mocked
 
 
-@pytest.fixture
-def confirm_yes():
-    with patch("shbin.Confirm.ask", return_value=True) as ask:
-        yield ask
-
-
-@pytest.fixture
-def confirm_no():
-    with patch("shbin.Confirm.ask", return_value=False) as ask:
-        yield ask
-
 
 @pytest.mark.parametrize("argv", (["-h"], ["--help"]))
 def test_help(capsys, argv):
@@ -119,7 +108,7 @@ def test_upload_file_with_target(tmp_path, patched_repo_and_user, repo, target):
     repo.create_file.assert_called_once_with(f"messi/{target.rstrip('/')}/hello.md", "", b"hello")
 
 
-def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user, repo, confirm_yes):
+def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user, repo):
     file = tmp_path / "hello.md"
     file.write_text("hello")
     main([str(file), "-d", "bye.md"])
