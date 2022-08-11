@@ -70,10 +70,11 @@ def expand_paths(path_or_patterns):
 
 def get_extension(content):
     try:
-        # import ipdb; ipdb.set_trace()
         import magic
     except ImportError as e:
-        print(f"[bold yellow]warning:[/bold yellow] check the README to proper install python-magic. Import Error: {e}")
+        print(
+            f"[bold yellow]warning:[/bold yellow] check the README to correctly install python-magic. Import Error: {e}"
+        )
         return ""
         # Optionally could we detect a few formats in our own?
         # for instance, images are easy https://stackoverflow.com/a/27670182/811740
