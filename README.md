@@ -22,6 +22,7 @@ It can be issues with [python-magic](https://github.com/ahupp/python-magic#osx) 
 - `When using macports: port install file`
 
 
+# Setup
 
 - Create a new [personal token](https://github.com/settings/tokens). Follow [these instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for details. Make sure of:
     
@@ -53,11 +54,11 @@ $ shbin -x
 $ shbin -x -f the_coolest_thing.py
 
 # from clipboard with a given name to a directory in your user directory
-$ shbin -x -f the_coolest_thing.py -o coolest_things/python
+$ shbin -x -f the_coolest_thing.py -d coolest_things/python
 
 
 # upload several files in a directory
-$ shbin *.ipynb *.csv -o notebooks/project -m "my new work"   
+$ shbin *.ipynb *.csv -d notebooks/project -m "my new work"   
 
 $ shbin -h   # show full options
 ```
