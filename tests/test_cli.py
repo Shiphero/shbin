@@ -47,7 +47,6 @@ def patched_repo_and_user(repo):
         yield mocked
 
 
-
 @pytest.mark.parametrize("argv", (["-h"], ["--help"]))
 def test_help(capsys, argv):
     with pytest.raises(SystemExit):
