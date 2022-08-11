@@ -3,16 +3,16 @@ usage = """
 
 Usage:
   shbin (-h | --help)
-  shbin (<path>... | -x [-f <file-name>]) [-n] [-m <message>] [-o <target_path>]
+  shbin (<path>... | -x [-f <file-name>]) [-n] [-m <message>] [-d <target-dir>]
 
 
 Options:
-  -h --help                                 Show this screen.
-  -x --from-clipboard                       Paste content from clipboard instead file/s
-  -f <file-name>, --file-name=<file-name>   Add name to content of clipboard
-  -m <message>, --message=<message>         Commit message
-  -o <target>, --target=<target>            Optional directory to upload file/s
-  -n --new                                  Create a new file if the given already exists
+  -h --help                                             Show this screen.
+  -x --from-clipboard                                   Paste content from clipboard instead file/s
+  -f <file-name>, --file-name=<file-name>               Add name to content of clipboard
+  -m <message>, --message=<message>                     Commit message
+  -d <target-dir>, --target-dir=<target-dir>            Optional directory to upload file/s
+  -n --new                                              Create a new file if the given already exists
   
 """
 
@@ -98,12 +98,14 @@ def main(argv=None) -> None:
         except pyclip.ClipboardSetupException as e:
             raise DocoptExit(str(e))
 
-        if args["--file-name"] and not args["--target"]:
+
+
+        if args["--file-name"] and not args["--target-dir"]:
             file_name = f'{args["--file-name"]}'
             directory = f"{user}"
-        elif args["--target"]:
-            directory = pathlib.PurePath(args["--target"])
-            extension = guess_extension(magic.from_buffer(content, mime=True))
+        elif args["--target-dir"]:
+            directory = pathlib.PurePath(args["--target-dir"])
+            extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
             file_name = f'{args["--file-name"]}'
             directory = f"{user}/{directory}"
@@ -116,15 +118,7 @@ def main(argv=None) -> None:
 
     else:
         files = list(expand_paths(args["<path>"]))
-        dir_target = args["--target"] or ""
-
-        if (
-            files
-            and pathlib.PurePath(dir_target).suffix
-            and not Confirm.ask("--output looks like a file, not a directory. Are you sure?")
-        ):
-            raise SystemExit(f"🚪 ok, see you soon")
-
+        dir_target = args["--target-dir"] or ""
         directory = f"{user}/{dir_target}".rstrip("/")
 
     message = args["--message"] or ""
