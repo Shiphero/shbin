@@ -47,18 +47,6 @@ def patched_repo_and_user(repo):
         yield mocked
 
 
-@pytest.fixture
-def confirm_yes():
-    with patch("shbin.Confirm.ask", return_value=True) as ask:
-        yield ask
-
-
-@pytest.fixture
-def confirm_no():
-    with patch("shbin.Confirm.ask", return_value=False) as ask:
-        yield ask
-
-
 @pytest.mark.parametrize("argv", (["-h"], ["--help"]))
 def test_help(capsys, argv):
     with pytest.raises(SystemExit):
@@ -115,23 +103,15 @@ def test_no_files(tmp_path, patched_repo_and_user, repo, capsys):
 def test_upload_file_with_target(tmp_path, patched_repo_and_user, repo, target):
     file = tmp_path / "hello.md"
     file.write_text("hello")
-    main([str(file), "-o", target])
+    main([str(file), "-d", target])
     repo.create_file.assert_called_once_with(f"messi/{target.rstrip('/')}/hello.md", "", b"hello")
 
 
-def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user, repo, confirm_yes):
+def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user, repo):
     file = tmp_path / "hello.md"
     file.write_text("hello")
-    main([str(file), "-o", "bye.md"])
+    main([str(file), "-d", "bye.md"])
     repo.create_file.assert_called_once_with("messi/bye.md/hello.md", "", b"hello")
-
-
-def test_upload_file_with_target_as_file_cancel(tmp_path, patched_repo_and_user, repo, confirm_no):
-    file = tmp_path / "hello.md"
-    file.write_text("hello")
-    with pytest.raises(SystemExit) as e:
-        main([str(file), "-o", "bye.md"])
-    assert "see you" in str(e)
 
 
 def test_upload_glob(tmp_path, monkeypatch, patched_repo_and_user, repo):
@@ -176,7 +156,16 @@ def test_png_from_clipboard(pyclip, patched_repo_and_user, repo, capsys):
 
 def test_from_clipboard_with_name(pyclip, patched_repo_and_user, repo, capsys):
     pyclip.copy(b"data")
-    main(["-x", "-o", "foo/data.md"])
+    main(["-x", "-f", "data.md"])
+    repo.create_file.assert_any_call("messi/data.md", "", b"data")
+    # the url was copied
+    assert pyclip.paste() == "https://the-url"
+    assert capsys.readouterr().out == "🔗📋 https://the-url\n"
+
+
+def test_from_clipboard_with_name_and_directory(pyclip, patched_repo_and_user, repo, capsys):
+    pyclip.copy(b"data")
+    main(["-x", "-f", "data.md", "-d", "foo"])
     repo.create_file.assert_any_call("messi/foo/data.md", "", b"data")
     # the url was copied
     assert pyclip.paste() == "https://the-url"

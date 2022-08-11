@@ -3,15 +3,16 @@ usage = """
 
 Usage:
   shbin (-h | --help)
-  shbin (<path>... | -x ) [-n] [-m <message>] [-o <target_path>]
+  shbin (<path>... | -x [-f <file-name>]) [-n] [-m <message>] [-d <target-dir>]
 
 
 Options:
-  -h --help                                 Show this screen.
-  -x --from-clipboard                       Paste content from clipboard instead file/s
-  -m <message>, --message=<message>         Commit message
-  -o <target>, --target=<target>            Optional filename or directory to upload file/s
-  -n --new                                  Create a new file if the given already exists
+  -h --help                                             Show this screen.
+  -x --from-clipboard                                   Paste content from clipboard instead file/s
+  -f <file-name>, --file-name=<file-name>               Add name to content of clipboard
+  -m <message>, --message=<message>                     Commit message
+  -d <target-dir>, --target-dir=<target-dir>            Optional directory to upload file/s
+  -n --new                                              Create a new file if the given already exists
   
 """
 
@@ -26,7 +27,6 @@ from mimetypes import guess_extension
 from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
-from rich.prompt import Confirm
 
 __version__ = "0.1"
 
@@ -97,27 +97,25 @@ def main(argv=None) -> None:
         except pyclip.ClipboardSetupException as e:
             raise DocoptExit(str(e))
 
-        if args["--target"]:
-            directory, path_name = pathlib.PurePath(args["--target"]).parts
+        if args["--file-name"] and not args["--target-dir"]:
+            file_name = f'{args["--file-name"]}'
+            directory = f"{user}"
+        elif args["--target-dir"]:
+            directory = pathlib.PurePath(args["--target-dir"])
+            extension = get_extension(content)
+            # TODO try autodectect extension via pygment if .txt was guessed.
+            file_name = f'{args["--file-name"]}'
             directory = f"{user}/{directory}"
         else:
             extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
-            path_name = f"{secrets.token_urlsafe(8)}{extension}"
+            file_name = f"{secrets.token_urlsafe(8)}{extension}"
             directory = f"{user}"
-        files = [FakePath(path_name, content=content)]
+        files = [FakePath(file_name, content=content)]
 
     else:
         files = list(expand_paths(args["<path>"]))
-        dir_target = args["--target"] or ""
-
-        if (
-            files
-            and pathlib.PurePath(dir_target).suffix
-            and not Confirm.ask("--output looks like a file, not a directory. Are you sure?")
-        ):
-            raise SystemExit(f"🚪 ok, see you soon")
-
+        dir_target = args["--target-dir"] or ""
         directory = f"{user}/{dir_target}".rstrip("/")
 
     message = args["--message"] or ""
