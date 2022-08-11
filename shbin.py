@@ -27,7 +27,6 @@ from mimetypes import guess_extension
 from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
-from rich.prompt import Confirm
 
 __version__ = "0.1"
 
