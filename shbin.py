@@ -67,9 +67,10 @@ def expand_paths(path_or_patterns):
 
     return itertools.chain.from_iterable(patterns)
 
+
 def get_extension(content):
     try:
-        #import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         import magic
     except ImportError as e:
         print(f"[bold yellow]warning:[/bold yellow] check the README to proper install python-magic. Import Error: {e}")
@@ -78,6 +79,7 @@ def get_extension(content):
         # for instance, images are easy https://stackoverflow.com/a/27670182/811740
     else:
         return guess_extension(magic.from_buffer(content, mime=True))
+
 
 def main(argv=None) -> None:
     args = docopt(__doc__ + usage, argv, version=__version__)
