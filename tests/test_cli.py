@@ -126,7 +126,6 @@ def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user
     repo.create_file.assert_called_once_with("messi/bye.md/hello.md", "", b"hello")
 
 
-
 def test_upload_glob(tmp_path, monkeypatch, patched_repo_and_user, repo):
     file1 = tmp_path / "hello.md"
     file2 = tmp_path / "bye.md"

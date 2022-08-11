@@ -98,8 +98,6 @@ def main(argv=None) -> None:
         except pyclip.ClipboardSetupException as e:
             raise DocoptExit(str(e))
 
-
-
         if args["--file-name"] and not args["--target-dir"]:
             file_name = f'{args["--file-name"]}'
             directory = f"{user}"
