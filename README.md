@@ -15,6 +15,14 @@ pip install --user pipx
 pipx install  git+ssh://git@github.com/Shiphero/shbin.git
 ```
 
+## OSX
+It can be issues with [python-magic](https://github.com/ahupp/python-magic#osx) install
+
+- `When using Homebrew: brew install libmagic`
+- `When using macports: port install file`
+
+
+
 - Create a new [personal token](https://github.com/settings/tokens). Follow [these instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) for details. Make sure of:
     
   - Enable Repo and User scopes

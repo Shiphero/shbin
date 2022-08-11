@@ -18,7 +18,7 @@ dependencies = [
     "pygithub >= 1.55",
     # pyclip with this patch https://github.com/spyoungtech/pyclip/pull/21
     "pyclip @ https://github.com/mgaitan/pyclip/archive/refs/heads/best_binary.zip",
-    "python-magic >= 0.4.3",
+    "python-magic >= 0.4.27",
     "docopt-ng >= 0.8.1",
     "rich >= 12.5",
 ]
