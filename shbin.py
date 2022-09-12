@@ -3,8 +3,8 @@ usage = """
 
 Usage:
   shbin (-h | --help)
+  shbin dl <url_or_path>
   shbin (<path>... | -x [-f <file-name>]) [-n] [-m <message>] [-d <target-dir>]
-
 
 Options:
   -h --help                                             Show this screen.
@@ -19,11 +19,12 @@ Options:
 import itertools
 import os
 import pathlib
+import re
 import secrets
 import sys
-import pyclip
-
 from mimetypes import guess_extension
+
+import pyclip
 from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
@@ -82,6 +83,37 @@ def get_extension(content):
         return guess_extension(magic.from_buffer(content, mime=True))
 
 
+def download(url_or_path, repo, user):
+    """
+    # download a file
+    $ shbin dl https://github.com/Shiphero/pastebin/blob/main/bibo/AWS_API_fullfilment_methods/AWS_fulfillment_methods.ipynb
+    $ shbin dl bibo/AWS_API_fullfilment_methods/AWS_fulfillment_methods.ipynb
+
+    # or a folder
+    $ shbin dl https://github.com/Shiphero/pastebin/blob/main/bibo/AWS_API_fullfilment_methods/
+    $ shbin dl bibo/AWS_API_fullfilment_methods/
+    """
+    path = re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path)
+    path = path.rstrip("/")
+    try:
+        content  = repo.get_contents(path)
+        if isinstance(content, list):
+            # FIXME currently this will flatten the tree:
+            # suposse dir/foo.py and dir/subdir/bar.py
+            # Then `$ shbin dl dir` will get foo.py and bar.py in the same dir. 
+            for content_file in content:
+                download(content_file.path, repo, user)
+            return
+        else:
+            content = content.decoded_content
+    except GithubException:
+        print(f"[red]🞬[/red] content not found")
+    else:
+        target = pathlib.Path(path).name
+        pathlib.Path(target).write_bytes(content)
+        print(f"[green]✓[/green] downloaded {target}") 
+
+
 def main(argv=None) -> None:
     args = docopt(__doc__ + usage, argv, version=__version__)
     try:
@@ -90,8 +122,10 @@ def main(argv=None) -> None:
         raise DocoptExit(
             f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
         )
+    if args["dl"]:
+        return download(args["<url_or_path>"], repo, user)
 
-    if args["--from-clipboard"]:
+    elif args["--from-clipboard"]:
         try:
             content = pyclip.paste()
         except pyclip.ClipboardSetupException as e:
