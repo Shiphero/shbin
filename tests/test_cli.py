@@ -75,7 +75,7 @@ def test_token_envvar_is_mandarory(monkeypatch):
     with pytest.raises(DocoptExit) as e:
         main(["foo.py"])
 
-    assert "error 'SHBIN_GITHUB_TOKEN'" in str(e)
+    assert "Ensure SHBIN_GITHUB_TOKEN" in str(e.value)
 
 
 def test_repo_envvar_is_mandarory(monkeypatch):
