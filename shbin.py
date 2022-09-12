@@ -96,11 +96,11 @@ def download(url_or_path, repo, user):
     path = re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path)
     path = path.rstrip("/")
     try:
-        content  = repo.get_contents(path)
+        content = repo.get_contents(path)
         if isinstance(content, list):
             # FIXME currently this will flatten the tree:
             # suposse dir/foo.py and dir/subdir/bar.py
-            # Then `$ shbin dl dir` will get foo.py and bar.py in the same dir. 
+            # Then `$ shbin dl dir` will get foo.py and bar.py in the same dir.
             for content_file in content:
                 download(content_file.path, repo, user)
             return
@@ -111,7 +111,7 @@ def download(url_or_path, repo, user):
     else:
         target = pathlib.Path(path).name
         pathlib.Path(target).write_bytes(content)
-        print(f"[green]✓[/green] downloaded {target}") 
+        print(f"[green]✓[/green] downloaded {target}")
 
 
 def main(argv=None) -> None:
