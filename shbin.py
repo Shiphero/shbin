@@ -4,7 +4,7 @@ usage = """
 Usage:
   shbin (-h | --help)
   shbin dl <url_or_path>
-  shbin (<path>... | -x [-f <file-name>]) [-n] [-m <message>] [-d <target-dir>]
+  shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>]
 
 Options:
   -h --help                                             Show this screen.
@@ -147,6 +147,11 @@ def main(argv=None) -> None:
             directory = f"{user}"
         files = [FakePath(file_name, content=content)]
 
+    elif args["--file-name"]:
+        file_name = f'{args["--file-name"]}'
+        directory = f"{user}"
+        content = next(expand_paths(args["<path>"])).read_bytes()
+        files = [FakePath(file_name, content=content)]        
     else:
         files = list(expand_paths(args["<path>"]))
         dir_target = args["--target-dir"] or ""
