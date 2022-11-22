@@ -151,7 +151,7 @@ def main(argv=None) -> None:
         file_name = f'{args["--file-name"]}'
         directory = f"{user}"
         content = next(expand_paths(args["<path>"])).read_bytes()
-        files = [FakePath(file_name, content=content)]        
+        files = [FakePath(file_name, content=content)]
     else:
         files = list(expand_paths(args["<path>"]))
         dir_target = args["--target-dir"] or ""
