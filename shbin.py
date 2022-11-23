@@ -128,7 +128,7 @@ def main(argv=None) -> None:
     # default namespace (without slash)
     # interpolate {user}
     namespace = args.get("--namespace")
-    if namespace is None: 
+    if namespace is None:
         namespace = os.environ.get("SHBIN_NAMESPACE", "{user}")
     namespace = namespace.format(user=user).rstrip("/")
 
@@ -167,9 +167,9 @@ def main(argv=None) -> None:
     message = args["--message"] or ""
 
     for path in files:
-        
+
         result = create_or_update(repo, path, namespace, message, args["--new"])
-        
+
     if not files:
         print("🤷 [bold]no file was uploaded[/bold]")
     else:
