@@ -4,15 +4,17 @@ usage = """
 Usage:
   shbin (-h | --help)
   shbin dl <url_or_path>
-  shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>]
+  shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] [--namespace=<namespace>]
 
 Options:
   -h --help                                             Show this screen.
   -x --from-clipboard                                   Paste content from clipboard instead file/s
+  -n --new                                              Create a new file if the given already exists
   -f <file-name>, --file-name=<file-name>               Add name to content of clipboard
   -m <message>, --message=<message>                     Commit message
-  -d <target-dir>, --target-dir=<target-dir>            Optional directory to upload file/s
-  -n --new                                              Create a new file if the given already exists
+  -d <target-dir>, --target-dir=<target-dir>            Optional (sub)directory to upload file/s. 
+  --namespace=<namespace>                               Base namespace to upload. Default to
+                                                        SHBIN_NAMESPACE envvar or "{user}/". 
   
 """
 
@@ -122,6 +124,14 @@ def main(argv=None) -> None:
         raise DocoptExit(
             f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
         )
+
+    # default namespace (without slash)
+    # interpolate {user}
+    namespace = args.get("--namespace")
+    if namespace is None: 
+        namespace = os.environ.get("SHBIN_NAMESPACE", "{user}")
+    namespace = namespace.format(user=user).rstrip("/")
+
     if args["dl"]:
         return download(args["<url_or_path>"], repo, user)
 
@@ -133,29 +143,26 @@ def main(argv=None) -> None:
 
         if args["--file-name"] and not args["--target-dir"]:
             file_name = f'{args["--file-name"]}'
-            directory = f"{user}"
         elif args["--target-dir"]:
             directory = pathlib.PurePath(args["--target-dir"])
             extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
             file_name = f'{args["--file-name"]}'
-            directory = f"{user}/{directory}"
+            namespace += f"/{directory}"
         else:
             extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
             file_name = f"{secrets.token_urlsafe(8)}{extension}"
-            directory = f"{user}"
         files = [FakePath(file_name, content=content)]
 
     elif args["--file-name"]:
         file_name = f'{args["--file-name"]}'
-        directory = f"{user}"
         content = next(expand_paths(args["<path>"])).read_bytes()
         files = [FakePath(file_name, content=content)]
     else:
         files = list(expand_paths(args["<path>"]))
         dir_target = args["--target-dir"] or ""
-        directory = f"{user}/{dir_target}".rstrip("/")
+        namespace += f"/{dir_target}".rstrip("/")
 
     message = args["--message"] or ""
 
@@ -163,7 +170,7 @@ def main(argv=None) -> None:
         file_content = path.read_bytes()
 
         try:
-            result = repo.create_file(f"{directory}/{path.name}", message, file_content)
+            result = repo.create_file(f"{namespace}/{path.name}".lstrip("/"), message, file_content)
         except GithubException:
             # file already exists
             if args["--new"]:
@@ -172,16 +179,16 @@ def main(argv=None) -> None:
                     f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Creating as {new_path}.",
                     file=sys.stderr,
                 )
-                result = repo.create_file(f"{directory}/{new_path}", message, file_content)
+                result = repo.create_file(f"{namespace}/{new_path}".lstrip("/"), message, file_content)
 
             else:
                 # TODO upload all the files in a single commit
-                contents = repo.get_contents(f"{directory}/{path.name}")
+                contents = repo.get_contents(f"{namespace}/{path.name}")
                 print(
                     f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Updating it.",
                     file=sys.stderr,
                 )
-                result = repo.update_file(f"{directory}/{path.name}", message, file_content, contents.sha)
+                result = repo.update_file(f"{namespace}/{path.name}".lstrip("/"), message, file_content, contents.sha)
 
     if not files:
         print("🤷 [bold]no file was uploaded[/bold]")

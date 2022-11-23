@@ -107,6 +107,21 @@ def test_upload_file_with_target(tmp_path, patched_repo_and_user, repo, target):
     repo.create_file.assert_called_once_with(f"messi/{target.rstrip('/')}/hello.md", "", b"hello")
 
 
+@pytest.mark.parametrize(
+    "namespace, expected",
+    [
+        ("", "hello.md"),
+        ("{user}-goat", "messi-goat/hello.md"),
+        ("goat/{user}/", "goat/messi/hello.md"),
+    ],
+)
+def test_upload_with_custom_prefix(tmp_path, patched_repo_and_user, repo, namespace, expected):
+    file = tmp_path / "hello.md"
+    file.write_text("hello")
+    main([str(file), "--namespace", namespace])
+    repo.create_file.assert_called_once_with(expected, "", b"hello")
+
+
 def test_upload_file_with_target_as_file_confirm(tmp_path, patched_repo_and_user, repo):
     file = tmp_path / "hello.md"
     file.write_text("hello")
@@ -167,6 +182,15 @@ def test_from_clipboard_with_name_and_directory(pyclip, patched_repo_and_user, r
     pyclip.copy(b"data")
     main(["-x", "-f", "data.md", "-d", "foo"])
     repo.create_file.assert_any_call("messi/foo/data.md", "", b"data")
+    # the url was copied
+    assert pyclip.paste() == "https://the-url"
+    assert capsys.readouterr().out == "🔗📋 https://the-url\n"
+
+
+def test_from_clipboard_with_namespace(pyclip, patched_repo_and_user, repo, capsys):
+    pyclip.copy(b"data")
+    main(["-x", "-f", "data.md", "--namespace", "foo"])
+    repo.create_file.assert_any_call("foo/data.md", "", b"data")
     # the url was copied
     assert pyclip.paste() == "https://the-url"
     assert capsys.readouterr().out == "🔗📋 https://the-url\n"
