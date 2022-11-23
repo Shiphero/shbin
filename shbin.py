@@ -167,29 +167,9 @@ def main(argv=None) -> None:
     message = args["--message"] or ""
 
     for path in files:
-        file_content = path.read_bytes()
-
-        try:
-            result = repo.create_file(f"{namespace}/{path.name}".lstrip("/"), message, file_content)
-        except GithubException:
-            # file already exists
-            if args["--new"]:
-                new_path = f"{path.stem}_{secrets.token_urlsafe(8)}{path.suffix}"
-                print(
-                    f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Creating as {new_path}.",
-                    file=sys.stderr,
-                )
-                result = repo.create_file(f"{namespace}/{new_path}".lstrip("/"), message, file_content)
-
-            else:
-                # TODO upload all the files in a single commit
-                contents = repo.get_contents(f"{namespace}/{path.name}")
-                print(
-                    f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Updating it.",
-                    file=sys.stderr,
-                )
-                result = repo.update_file(f"{namespace}/{path.name}".lstrip("/"), message, file_content, contents.sha)
-
+        
+        result = create_or_update(repo, path, namespace, message, args["--new"])
+        
     if not files:
         print("🤷 [bold]no file was uploaded[/bold]")
     else:
@@ -201,6 +181,32 @@ def main(argv=None) -> None:
         except pyclip.ClipboardSetupException:
             pass
         print(f"{emoji} {url}")
+
+
+def create_or_update(repo, path, namespace, message, force_new):
+    file_content = path.read_bytes()
+    file_name = f"{namespace}/{path.name}".lstrip("/")
+    try:
+        result = repo.create_file(file_name, message, file_content)
+    except GithubException:
+        # file already exists
+        if force_new:
+            new_path = f"{path.stem}_{secrets.token_urlsafe(8)}{path.suffix}"
+            print(
+                f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Creating as {new_path}.",
+                file=sys.stderr,
+            )
+            result = repo.create_file(f"{namespace}/{new_path}".lstrip("/"), message, file_content)
+
+        else:
+            # TODO upload all the files in a single commit
+            contents = repo.get_contents(file_name)
+            print(
+                f"[bold yellow]warning:[/bold yellow] {path.name} already exists. Updating it.",
+                file=sys.stderr,
+            )
+            result = repo.update_file(file_name, message, file_content, contents.sha)
+    return result
 
 
 if __name__ == "__main__":
