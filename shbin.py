@@ -1,23 +1,4 @@
 """Upload content to your pastebin repo"""
-usage = """
-
-Usage:
-  shbin (-h | --help)
-  shbin dl <url_or_path>
-  shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] [--namespace=<namespace>]
-
-Options:
-  -h --help                                             Show this screen.
-  -x --from-clipboard                                   Paste content from clipboard instead file/s
-  -n --new                                              Create a new file if the given already exists
-  -f <file-name>, --file-name=<file-name>               Add name to content of clipboard
-  -m <message>, --message=<message>                     Commit message
-  -d <target-dir>, --target-dir=<target-dir>            Optional (sub)directory to upload file/s. 
-  --namespace=<namespace>                               Base namespace to upload. Default to
-                                                        SHBIN_NAMESPACE envvar or "{user}/". 
-  
-"""
-
 import itertools
 import os
 import pathlib
@@ -31,7 +12,27 @@ from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
 
-__version__ = "0.1"
+usage = """
+
+Usage:
+  shbin (-h | --help)
+  shbin dl <url_or_path>
+  shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
+        [--namespace=<namespace>] [--url-link-to-pages]
+
+Options:
+  -h --help                                         Show this screen.
+  -x --from-clipboard                               Paste content from clipboard instead file/s
+  -n --new                                          Create a new file if the given already exists
+  -f <file-name>, --file-name=<file-name>           Add name to content of clipboard
+  -m <message>, --message=<message>                 Commit message
+  -d <target-dir>, --target-dir=<target-dir>        Optional (sub)directory to upload file/s. 
+  --namespace=<namespace>                           Base namespace to upload. Default to
+                                                    SHBIN_NAMESPACE envvar or "{user}/". 
+  -p, --url-link-to-pages                           Reformat the url to link to Github pages. 
+"""
+
+__version__ = "0.1.1"
 
 
 class FakePath:
@@ -109,7 +110,7 @@ def download(url_or_path, repo, user):
         else:
             content = content.decoded_content
     except GithubException:
-        print(f"[red]🞬[/red] content not found")
+        print("[red]x[/red] content not found")
     else:
         target = pathlib.Path(path).name
         pathlib.Path(target).write_bytes(content)
@@ -167,13 +168,16 @@ def main(argv=None) -> None:
     message = args["--message"] or ""
 
     for path in files:
-
         result = create_or_update(repo, path, namespace, message, args["--new"])
 
     if not files:
         print("🤷 [bold]no file was uploaded[/bold]")
     else:
         url = result["content"].html_url.rpartition("/")[0] if len(files) > 1 else result["content"].html_url
+        if args["--url-link-to-pages"]:
+            content = url.partition(f"{repo.default_branch}/")[-1]
+            url = f"https://{repo.owner.login.lower()}.github.io/{repo.name}/{content}"
+
         emoji = "🔗"
         try:
             pyclip.copy(str(url))
