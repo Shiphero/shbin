@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "shbin"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "BSD 3-Clause License"}
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -16,8 +16,7 @@ authors = [
 ]
 dependencies = [
     "pygithub >= 1.55",
-    # pyclip with this patch https://github.com/spyoungtech/pyclip/pull/21
-    "pyclip @ https://github.com/mgaitan/pyclip/archive/refs/heads/best_binary.zip",
+    "pyclip >= 0.7.0",
     "python-magic >= 0.4.27",
     "docopt-ng >= 0.8.1",
     "rich >= 12.5",
@@ -27,18 +26,18 @@ dynamic = ["version", "description"]
 [project.scripts]
 shbin = "shbin:main"
 
-
 [project.optional-dependencies]
 dev = [
     "pytest",
     "black"
 ]
 
-[tool.ipdb]
-context=5
-
-
 [tool.black]
+target-version = ["py38"]
 line-length = 120
-target-version = ["py37"]
 color = true
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+
