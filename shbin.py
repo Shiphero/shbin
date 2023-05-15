@@ -178,7 +178,7 @@ def main(argv=None) -> None:
         if args["--url-link-to-pages"]:
             content = url.partition(f"{repo.default_branch}/")[-1]
             url = f"https://{repo.owner.login.lower()}.github.io/{repo.name}/{content}"
-            
+
         emoji = "🔗"
         try:
             pyclip.copy(str(url))
