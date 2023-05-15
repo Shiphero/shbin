@@ -168,7 +168,6 @@ def main(argv=None) -> None:
     message = args["--message"] or ""
 
     for path in files:
-
         result = create_or_update(repo, path, namespace, message, args["--new"])
 
     if not files:
