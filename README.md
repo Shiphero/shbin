@@ -96,7 +96,7 @@ port install file
 
 # Setup
 
-Create a [new fine-grained personal token](https://github.com/settings/personal-access-tokens/new) on Github for your "pastebin" repository (under your user or your organization ownership), with read and write permissions on "contents: 
+Create a [new fine-grained personal token](https://github.com/settings/personal-access-tokens/new) on Github restricted to your "pastebin" repository (under your user or your organization ownership), with read and write permissions on "Contents". 
 
 ![image](https://user-images.githubusercontent.com/2355719/238758491-9d15e7e6-e4b7-43c8-a321-b65c968fc7e0.png)
 
