@@ -48,6 +48,9 @@ $ shbin -x -f the_coolest_thing.py -d coolest_things/python
 # upload several files in a directory
 $ shbin *.ipynb *.csv -d notebooks/project -m "my new work"   
 
+# Reformat the URL to link to Github pages
+$ shbin demo.py -p
+
 $ shbin -h   # show full options
 ```
 
