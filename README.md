@@ -65,13 +65,19 @@ It uses [Github API](https://docs.github.com/en/rest/repos/contents?apiVersion=2
 The recommended way is to use [pipx](https://pypa.github.io/pipx/)
 
 ```console
-pipx install git+ssh://git@github.com/Shiphero/shbin.git
+pipx install shbin 
 ```
 
 Alternatively, install directly with pip
 
 ```console
-pipx install --user git+ssh://git@github.com/Shiphero/shbin.git
+pip install --user shbin
+```
+
+To install the latest development version from the repository:
+
+```console
+pip install --user git+ssh://git@github.com/Shiphero/shbin.git
 ```
 
 ## OSX
