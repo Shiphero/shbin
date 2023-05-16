@@ -5,8 +5,7 @@
 
 `shbin` turns a Github repo in a pastebin. 
 
-It's tiny command line tool to upload snippets, notebooks, images or any other file easily to a repository that works as your internal Pastebin, returning the url to share it with your team.
-
+It's a tiny command line tool to upload snippets, notebooks, images or any other file easily to a repository that works as your internal Pastebin, returning the url to share it with your team. If possible, that url is automatically copied to the clipboard. 
 
 # Why? 
 
@@ -77,7 +76,7 @@ pip install --user shbin
 To install the latest development version from the repository:
 
 ```console
-pip install --user git+ssh://git@github.com/Shiphero/shbin.git
+pip install --user https://github.com/Shiphero/shbin/archive/refs/heads/main.zip
 ```
 
 ## OSX
@@ -109,13 +108,13 @@ port install file
     export SHBIN_REPO = "<your organization>/<the repo>"   # example "Shiphero/pastebin"   
     ```
 
-- By default `shbin` assigns a top-level folder to separate the content uploaded by each user. That could be changed with the `SHBIN_NAMESPACE` environment variable or `--namespace` argument from the command line.
+- By default `shbin` assigns a top-level folder to separate the content uploaded by each user. That could be changed with the `SHBIN_NAMESPACE` environment variable or `--namespace` argument from the command line. For example: 
 
   -  `export SHBIN_NAMESPACE=""`        # no namespace
-  -  `export SHBIN_NAMESPACE="pastebin_folder"  # the full pastebin is inside pastebin_folder/" 
-  - `export SHBIN_NAMESPACE="pastebin_folder/{user}"   # mix of both: each user has its own folder inside pastebin_folder/
+  -  `export SHBIN_NAMESPACE="pastebin_folder"`  # the full pastebin is inside pastebin_folder/" 
+  - `export SHBIN_NAMESPACE="pastebin_folder/{user}"`   # mix of both: each user has its own folder inside pastebin_folder/
 
-- [optionally] Install xclip to be able to copy from your clipboard. For example in Ubuntu/Debian
+- [optionally] In Linux, install `xclip` to be able to copy from your clipboard. For example in Ubuntu/Debian
   
   ```console
   $ sudo apt install xclip
