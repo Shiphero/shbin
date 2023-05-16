@@ -1,4 +1,6 @@
-"""Upload content to your pastebin repo"""
+"""
+Turns a Github repo into a pastebin.
+"""
 import itertools
 import os
 import pathlib
@@ -15,10 +17,11 @@ from rich import print
 usage = """
 
 Usage:
-  shbin (-h | --help)
-  shbin dl <url_or_path>
   shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
         [--namespace=<namespace>] [--url-link-to-pages]
+  shbin dl <url_or_path>
+  shbin (-h | --help)
+  
 
 Options:
   -h --help                                         Show this screen.
