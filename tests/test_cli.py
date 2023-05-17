@@ -7,7 +7,7 @@ from github import GithubException
 from github.Repository import Repository
 from pyclip import ClipboardSetupException as RealClipboardSetupException
 
-from shbin import __version__, main
+from shbin import __version__, __doc__, main
 
 PNG_1x1 = (
     b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90wS\xde\x00"
@@ -64,7 +64,7 @@ def test_help(capsys, argv):
         main(argv)
 
     output = capsys.readouterr().out
-    assert "Upload content to your pastebin repo" in output
+    assert __doc__.strip() in output
     assert "Usage:" in output
     assert "Options:" in output
 
