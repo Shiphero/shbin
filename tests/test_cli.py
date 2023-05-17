@@ -1,4 +1,5 @@
 from unittest.mock import Mock, create_autospec, patch
+import io
 
 import pytest
 from docopt import DocoptExit
@@ -39,6 +40,16 @@ def pyclip(monkeypatch):
     clip = Stub()
     monkeypatch.setattr("shbin.pyclip", clip)
     return clip
+
+
+@pytest.fixture
+def stdin(monkeypatch):
+    def patch(data):
+        monkeypatch.setattr("sys.stdin", Mock(buffer=io.BytesIO(data)))
+
+    # some default data
+    patch(b"input data")
+    return patch
 
 
 @pytest.fixture
@@ -191,6 +202,35 @@ def test_from_clipboard_with_namespace(pyclip, patched_repo_and_user, repo, caps
     pyclip.copy(b"data")
     main(["-x", "-f", "data.md", "--namespace", "foo"])
     repo.create_file.assert_any_call("foo/data.md", "", b"data")
+    # the url was copied
+    assert pyclip.paste() == "https://the-url"
+    assert capsys.readouterr().out == "🔗📋 https://the-url\n"
+
+
+def test_plain_from_stdin(stdin, pyclip, patched_repo_and_user, repo, capsys):
+    stdin(b"some data")
+    with patch("shbin.secrets.token_urlsafe", return_value="abc"):
+        main(["-"])
+    repo.create_file.assert_any_call("messi/abc.txt", "", b"some data")
+    # the url was copied
+    assert pyclip.paste() == "https://the-url"
+    assert capsys.readouterr().out == "🔗📋 https://the-url\n"
+
+
+def test_from_stdin_with_name(stdin, pyclip, patched_repo_and_user, repo, capsys):
+    stdin(b"data")
+    main(["-", "-f", "data.md"])
+    repo.create_file.assert_any_call("messi/data.md", "", b"data")
+    # the url was copied
+    assert pyclip.paste() == "https://the-url"
+    assert capsys.readouterr().out == "🔗📋 https://the-url\n"
+
+
+def test_png_from_stdin(stdin, pyclip, patched_repo_and_user, repo, capsys):
+    stdin(PNG_1x1)
+    with patch("shbin.secrets.token_urlsafe", return_value="abc"):
+        main(["-"])
+    repo.create_file.assert_any_call("messi/abc.png", "", PNG_1x1)
     # the url was copied
     assert pyclip.paste() == "https://the-url"
     assert capsys.readouterr().out == "🔗📋 https://the-url\n"
