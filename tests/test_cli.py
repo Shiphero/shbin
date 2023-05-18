@@ -107,7 +107,7 @@ def test_upload_file(tmp_path, patched_repo_and_user, repo, pyclip, capsys):
     assert capsys.readouterr().out == "🔗📋 https://the-url\n"
 
 
-@pytest.mark.parametrize('disable', ("0", "false", "no", "FALSE"))
+@pytest.mark.parametrize("disable", ("0", "false", "no", "FALSE"))
 def test_upload_file_no_copy_url(tmp_path, patched_repo_and_user, repo, pyclip, capsys, monkeypatch, disable):
     pyclip.copy("foo")
     monkeypatch.setenv("SHBIN_COPY_URL", disable)
@@ -116,9 +116,9 @@ def test_upload_file_no_copy_url(tmp_path, patched_repo_and_user, repo, pyclip, 
     main([str(file)])
     repo.create_file.assert_called_once_with("messi/hello.py", "", b'print("hello")')
     # url not copied
-    assert pyclip.paste() == "foo"  
+    assert pyclip.paste() == "foo"
     # no clipboard emoji
-    assert capsys.readouterr().out == "🔗 https://the-url\n"   
+    assert capsys.readouterr().out == "🔗 https://the-url\n"
 
 
 def test_no_files(tmp_path, patched_repo_and_user, repo, capsys):
@@ -146,6 +146,22 @@ def test_upload_with_custom_prefix(tmp_path, patched_repo_and_user, repo, namesp
     file = tmp_path / "hello.md"
     file.write_text("hello")
     main([str(file), "--namespace", namespace])
+    repo.create_file.assert_called_once_with(expected, "", b"hello")
+
+
+@pytest.mark.parametrize(
+    "namespace, expected",
+    [
+        ("", "hello.md"),
+        ("{user}-goat", "messi-goat/hello.md"),
+        ("goat/{user}/", "goat/messi/hello.md"),
+    ],
+)
+def test_upload_with_namespace_from_envvar(tmp_path, patched_repo_and_user, repo, namespace, expected, monkeypatch):
+    monkeypatch.setenv("SHBIN_NAMESPACE", namespace)
+    file = tmp_path / "hello.md"
+    file.write_text("hello")
+    main([str(file)])
     repo.create_file.assert_called_once_with(expected, "", b"hello")
 
 
