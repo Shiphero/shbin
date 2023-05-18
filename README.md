@@ -1,5 +1,7 @@
 ![](https://github.com/Shiphero/shbin/actions/workflows/pytest.yml/badge.svg)
 ![](https://github.com/Shiphero/shbin/actions/workflows/black.yml/badge.svg)
+[![PyPI version](https://img.shields.io/pypi/v/shbin)](https://pypi.org/project/shbin/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/shbin)](https://pypi.org/project/shbin/)
 
 `shbin` turns a Github repo into a pastebin. 
 
