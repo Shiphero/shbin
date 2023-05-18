@@ -142,9 +142,17 @@ your organization's ownership), with read and write permissions on
   - `export SHBIN_NAMESPACE=""`        # no namespace
   - `export SHBIN_NAMESPACE="pastebin_folder"`  # the full pastebin is inside pastebin_folder/" 
   - `export SHBIN_NAMESPACE="pastebin_folder/{user}"`   # mix of both: each user has its own subfolder inside `pastebin_folder/` 
-  - [optional] To interact with the clipboard, we use the library `pyclip`.
-    This may require some additional system dependencies
-    depending your operating system. See [these notes](https://github.com/spyoungtech/pyclip#platform-specific-notesissues).
+
+- [optional] To interact with the clipboard, we use the library `pyclip`.
+  This may require some additional system dependencies
+  depending your operating system. See [these notes](https://github.com/spyoungtech/pyclip#platform-specific-notesissues).
+
+  If you want to disable the automatic copying of the URL to the clipboard 
+  you can set the environment variable `SHBIN_COPY_URL=false` (or "0" or "no"). 
+  
+  This is useful in some Linux distributions that use Wayland as the call via `wl-copy`
+  that `pyclip` uses in such environment can be slow. 
+
 
 
 PRs are welcome! 
