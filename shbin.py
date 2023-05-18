@@ -186,8 +186,9 @@ def main(argv=None) -> None:
 
         emoji = "🔗"
         try:
-            pyclip.copy(str(url))
-            emoji += "📋"
+            if os.environ.get("SHBIN_COPY_URL", "").strip().lower() not in ("0", "false", "no"):
+                pyclip.copy(str(url))
+                emoji += "📋"
         except pyclip.ClipboardSetupException:
             pass
         print(f"{emoji} {url}")

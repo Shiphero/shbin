@@ -98,11 +98,27 @@ def test_repo_envvar_is_mandarory(monkeypatch):
     assert "error 'SHBIN_REPO'" in str(e)
 
 
-def test_upload_file(tmp_path, patched_repo_and_user, repo):
+def test_upload_file(tmp_path, patched_repo_and_user, repo, pyclip, capsys):
     file = tmp_path / "hello.py"
     file.write_text('print("hello")')
     main([str(file)])
     repo.create_file.assert_called_once_with("messi/hello.py", "", b'print("hello")')
+    assert pyclip.paste() == "https://the-url"
+    assert capsys.readouterr().out == "🔗📋 https://the-url\n"
+
+
+@pytest.mark.parametrize('disable', ("0", "false", "no", "FALSE"))
+def test_upload_file_no_copy_url(tmp_path, patched_repo_and_user, repo, pyclip, capsys, monkeypatch, disable):
+    pyclip.copy("foo")
+    monkeypatch.setenv("SHBIN_COPY_URL", disable)
+    file = tmp_path / "hello.py"
+    file.write_text('print("hello")')
+    main([str(file)])
+    repo.create_file.assert_called_once_with("messi/hello.py", "", b'print("hello")')
+    # url not copied
+    assert pyclip.paste() == "foo"  
+    # no clipboard emoji
+    assert capsys.readouterr().out == "🔗 https://the-url\n"   
 
 
 def test_no_files(tmp_path, patched_repo_and_user, repo, capsys):
