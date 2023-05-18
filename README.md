@@ -53,6 +53,9 @@ $ shbin -x
 # upload the content in the clipboard with a given filename
 $ shbin -x -f my_snippet.md 
 
+# upload from stdin
+$ echo "some content" | shbin -
+
 # download a given file (inside the namespace)
 $ shbin dl my_snippet.md     
 

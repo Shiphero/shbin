@@ -17,7 +17,7 @@ from rich import print
 usage = """
 
 Usage:
-  shbin (<path>... | -x ) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
+  shbin (<path>... | -x | -) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
         [--namespace=<namespace>] [--url-link-to-pages]
   shbin dl <url_or_path>
   shbin (-h | --help)
@@ -139,11 +139,14 @@ def main(argv=None) -> None:
     if args["dl"]:
         return download(args["<url_or_path>"], repo, user)
 
-    elif args["--from-clipboard"]:
-        try:
-            content = pyclip.paste()
-        except pyclip.ClipboardSetupException as e:
-            raise DocoptExit(str(e))
+    elif args["--from-clipboard"] or args["<path>"] == ["-"]:
+        if args["--from-clipboard"]:
+            try:
+                content = pyclip.paste()
+            except pyclip.ClipboardSetupException as e:
+                raise DocoptExit(str(e))
+        else:
+            content = sys.stdin.buffer.read()
 
         if args["--file-name"] and not args["--target-dir"]:
             file_name = f'{args["--file-name"]}'
