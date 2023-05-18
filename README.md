@@ -1,5 +1,5 @@
-![](https://github.com/Shiphero/shbin/actions/workflows/pytest.yml/badge.svg)
-![](https://github.com/Shiphero/shbin/actions/workflows/black.yml/badge.svg)
+[![tests](https://github.com/Shiphero/shbin/actions/workflows/pytest.yml/badge.svg?branch=main)](https://github.com/Shiphero/shbin/actions/workflows/pytest.yml)
+[![black](https://github.com/Shiphero/shbin/actions/workflows/black.yml/badge.svg?branch=main)](https://github.com/Shiphero/shbin/actions/workflows/black.yml)
 [![PyPI version](https://img.shields.io/pypi/v/shbin)](https://pypi.org/project/shbin/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/shbin)](https://pypi.org/project/shbin/)
 
