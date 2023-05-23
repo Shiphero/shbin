@@ -1,1 +1,0 @@
-https://github.com/Shiphero/shbin/blob/main/alvarmaciel/-B8Iyocj07E.txt

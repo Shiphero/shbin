@@ -1,8 +1,0 @@
-`shbin` turns a Github repo into a pastebin. 
-
-It's a tiny command-line tool we've built at
-[Shiphero](http://shiphero.com) that lets you easily upload code
-snippets, notebooks, images, or any other file to a Github repository
-that acts as your internal pastebin, and returns the URL to share it
-with your team. If possible, this URL is automatically copied to the
-clipboard.
