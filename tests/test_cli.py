@@ -15,6 +15,7 @@ PNG_1x1 = (
     b"\x00\x00\x0cIDATx\x9cc\xb8\xbb\xe8=\x00\x04\xce\x02o\x8a\xc4\xab\xc4\x00\x00\x00\x00IEND\xaeB`\x82"
 )
 
+
 def create_github_downloable_files(data):
     class ContentFile:
         pass
@@ -24,6 +25,7 @@ def create_github_downloable_files(data):
     for key, value in data.items():
         setattr(obj, key, value)
     return obj
+
 
 @pytest.fixture
 def repo():
@@ -130,6 +132,14 @@ def test_upload_file_no_copy_url(tmp_path, patched_repo_and_user, repo, pyclip, 
     # no clipboard emoji
     assert capsys.readouterr().out == "🔗 https://the-url\n"
 
+
+def test_upload_file_with_name_and_directory(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
+    file = tmp_path / "hello.md"
+    file.write_bytes(b"hello")
+    
+    main([str(file), "-f", "data.md", "-d", "foo"])
+    repo.create_file.assert_any_call("messi/foo/data.md", "", b"hello")
+    
 
 def test_no_files(tmp_path, patched_repo_and_user, repo, capsys):
     main(["NOT_EXISTENT"])
@@ -302,6 +312,7 @@ def test_force_new(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
     repo.create_file.assert_called_with("messi/hello_abc.md", "", b"hello")
     assert capsys.readouterr().out == "🔗📋 https://the-url-2\n"
 
+
 def test_download_a_file(tmp_path, patched_repo_and_user, repo):
     git_data = {
         "decoded_content": b"awesome content",
@@ -312,6 +323,3 @@ def test_download_a_file(tmp_path, patched_repo_and_user, repo):
     os.chdir(working_dir)
     main(["dl", "hello.md"])
     assert (working_dir / "hello.md").read_bytes() == b"awesome content"
-
-
-
