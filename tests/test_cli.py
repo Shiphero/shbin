@@ -136,10 +136,17 @@ def test_upload_file_no_copy_url(tmp_path, patched_repo_and_user, repo, pyclip, 
 def test_upload_file_with_name_and_directory(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
     file = tmp_path / "hello.md"
     file.write_bytes(b"hello")
-    
+
     main([str(file), "-f", "data.md", "-d", "foo"])
     repo.create_file.assert_any_call("messi/foo/data.md", "", b"hello")
-    
+
+
+def test_uploads_file_with_name_fails(tmp_path, patched_repo_and_user, repo):
+    file1 = tmp_path / "hello.md"
+    file2 = tmp_path / "hello2.md"
+    with pytest.raises(DocoptExit, match=r"\-\-file\-name can only be used with a single file"):
+        main([str(file1), str(file2), "-f", "data.md"])
+
 
 def test_no_files(tmp_path, patched_repo_and_user, repo, capsys):
     main(["NOT_EXISTENT"])

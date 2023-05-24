@@ -137,7 +137,7 @@ def main(argv=None) -> None:
     namespace = namespace.format(user=user).rstrip("/")
     if args["--target-dir"]:
         namespace += f"/{args['--target-dir'].rstrip('/')}"
-    
+
     if args["dl"]:
         return download(args["<url_or_path>"], repo, user)
 
@@ -166,7 +166,7 @@ def main(argv=None) -> None:
             file_name = args["--file-name"]
             content = files[0].read_bytes()
             files = [FakePath(file_name, content=content)]
-    
+
     message = args["--message"] or ""
 
     for path in files:
