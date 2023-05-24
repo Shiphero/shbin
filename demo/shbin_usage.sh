@@ -12,7 +12,7 @@ M "upload or update a file"
 c shbin $MY_WORKING_DIR/demo.py
 
 M "upload with a commit description"
-c shbin $MY_WORKING_DIR/demo_2.py -m 'my cool demo script'
+c shbin $MY_WORKING_DIR/demo_2.py -m \"my cool demo script\"
 
 M "Upload any content in clipboard, discovering its format. e.g."
 echo "some awesome thing" | pyclip copy
@@ -36,13 +36,13 @@ echo "some awesome new content" >> $MY_WORKING_DIR/my_snippet_2.md
 c shbin $MY_WORKING_DIR/my_snippet_2.md
 
 M "copy from clipboard"
-c pyclip copy < demo.py
+c cat $MY_WORKING_DIR/demo.py | pyclip copy
 
 M "upload the content with a given name to a directory in your user directory"
 c shbin -x -f the_coolest_thing.py -d demo/coolest_things/python
 
 M "upload several files in a directory"
-c shbin $MY_WORKING_DIR/*.ipynb $MY_WORKING_DIR/*.csv -d demo/notebooks/project -m "my new work"
+c shbin $MY_WORKING_DIR/*.py $MY_WORKING_DIR/*.sh -d demo/notebooks/project -m \"my new work\"
 
 M "Reformat the URL to link to Github pages."
 c shbin $MY_WORKING_DIR/demo_3.py -p
