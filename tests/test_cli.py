@@ -35,7 +35,7 @@ def repo():
     return repo
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def pyclip(monkeypatch):
     class Stub:
         def copy(self, content):
