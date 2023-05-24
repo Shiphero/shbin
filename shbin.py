@@ -129,12 +129,14 @@ def main(argv=None) -> None:
             f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
         )
 
-    # default namespace (without slash)
-    # interpolate {user}
+    # resolves namespace + target-dir (without ending slash)
+    # it also interpolates {user}
     namespace = args.get("--namespace")
     if namespace is None:
         namespace = os.environ.get("SHBIN_NAMESPACE", "{user}")
     namespace = namespace.format(user=user).rstrip("/")
+    if args["--target-dir"]:
+        namespace += f"/{args['--target-dir'].rstrip('/')}"
 
     if args["dl"]:
         return download(args["<url_or_path>"], repo, user)
@@ -148,28 +150,22 @@ def main(argv=None) -> None:
         else:
             content = sys.stdin.buffer.read()
 
-        if args["--file-name"] and not args["--target-dir"]:
+        if args["--file-name"]:
             file_name = f'{args["--file-name"]}'
-        elif args["--target-dir"]:
-            directory = pathlib.PurePath(args["--target-dir"])
-            extension = get_extension(content)
-            # TODO try autodectect extension via pygment if .txt was guessed.
-            file_name = f'{args["--file-name"]}'
-            namespace += f"/{directory}"
         else:
             extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
             file_name = f"{secrets.token_urlsafe(8)}{extension}"
         files = [FakePath(file_name, content=content)]
-
-    elif args["--file-name"]:
-        file_name = f'{args["--file-name"]}'
-        content = next(expand_paths(args["<path>"])).read_bytes()
-        files = [FakePath(file_name, content=content)]
     else:
         files = list(expand_paths(args["<path>"]))
-        dir_target = args["--target-dir"] or ""
-        namespace += f"/{dir_target}".rstrip("/")
+        if args["--file-name"]:
+            if len(files) > 1:
+                raise DocoptExit("--file-name can only be used with a single file")
+
+            file_name = args["--file-name"]
+            content = files[0].read_bytes()
+            files = [FakePath(file_name, content=content)]
 
     message = args["--message"] or ""
 

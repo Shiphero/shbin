@@ -15,6 +15,7 @@ PNG_1x1 = (
     b"\x00\x00\x0cIDATx\x9cc\xb8\xbb\xe8=\x00\x04\xce\x02o\x8a\xc4\xab\xc4\x00\x00\x00\x00IEND\xaeB`\x82"
 )
 
+
 def create_github_downloable_files(data):
     class ContentFile:
         pass
@@ -25,6 +26,7 @@ def create_github_downloable_files(data):
         setattr(obj, key, value)
     return obj
 
+
 @pytest.fixture
 def repo():
     repo = create_autospec(Repository, name="gh_repo")
@@ -33,7 +35,7 @@ def repo():
     return repo
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def pyclip(monkeypatch):
     class Stub:
         def copy(self, content):
@@ -129,6 +131,21 @@ def test_upload_file_no_copy_url(tmp_path, patched_repo_and_user, repo, pyclip, 
     assert pyclip.paste() == "foo"
     # no clipboard emoji
     assert capsys.readouterr().out == "🔗 https://the-url\n"
+
+
+def test_upload_file_with_name_and_directory(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
+    file = tmp_path / "hello.md"
+    file.write_bytes(b"hello")
+
+    main([str(file), "-f", "data.md", "-d", "foo"])
+    repo.create_file.assert_any_call("messi/foo/data.md", "", b"hello")
+
+
+def test_uploads_file_with_name_fails(tmp_path, patched_repo_and_user, repo):
+    file1 = tmp_path / "hello.md"
+    file2 = tmp_path / "hello2.md"
+    with pytest.raises(DocoptExit, match=r"\-\-file\-name can only be used with a single file"):
+        main([str(file1), str(file2), "-f", "data.md"])
 
 
 def test_no_files(tmp_path, patched_repo_and_user, repo, capsys):
@@ -302,6 +319,7 @@ def test_force_new(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
     repo.create_file.assert_called_with("messi/hello_abc.md", "", b"hello")
     assert capsys.readouterr().out == "🔗📋 https://the-url-2\n"
 
+
 def test_download_a_file(tmp_path, patched_repo_and_user, repo):
     git_data = {
         "decoded_content": b"awesome content",
@@ -312,6 +330,3 @@ def test_download_a_file(tmp_path, patched_repo_and_user, repo):
     os.chdir(working_dir)
     main(["dl", "hello.md"])
     assert (working_dir / "hello.md").read_bytes() == b"awesome content"
-
-
-
