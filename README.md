@@ -39,6 +39,8 @@ The only downside of a plain repository is that it is not as easy as
 But `shbin` solves that. 
 
 # Usage
+Full video demo
+()[https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg]
 
 ```console
 # upload or update a file
