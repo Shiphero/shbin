@@ -158,5 +158,7 @@ your organization's ownership), with read and write permissions on
   that `pyclip` uses in such environment can be slow. 
 
 
-
+Nice video courtesy of [tuterm](https://github.com/veracioux/tuterm), [asciinema](https://asciinema.org/) and [svg-term-cli](https://github.com/marionebl/svg-term-cli)
 PRs are welcome! 
+
+
