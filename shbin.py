@@ -17,9 +17,9 @@ from rich import print
 usage = """
 
 Usage:
+  shbin dl <url_or_path>  
   shbin (<path>... | -x | -) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
         [--namespace=<namespace>] [--url-link-to-pages]
-  shbin dl <url_or_path>
   shbin (-h | --help)
   
 
