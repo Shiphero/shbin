@@ -1,11 +1,15 @@
 #!/usr/bin/env sh
-# file: shbin_usage.sh
+# file: > shbin_usage
+prompt() {
+    echo -ne "\033[1;94m$SHBIN_PROMPT \033[1;35m$(pwd | sed "s:$HOME:~:")\033[0;33m $\033[0m "
+}
 configure() {
     DELAY=0.1
     DELAY_SEP=0.15
     DELAY_PROMPT=1.2
     COLOR_MESSAGE='1;32'
 }
+SHBIN_PROMPT="shbin >"
 
 run() {
 M "upload or update a file"
