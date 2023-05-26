@@ -3,42 +3,46 @@
 [![PyPI version](https://img.shields.io/pypi/v/shbin)](https://pypi.org/project/shbin/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/shbin)](https://libraries.io/pypi/shbin)
 
-`shbin` turns a Github repo into a pastebin. 
+`shbin` turns a Github repo into a pastebin.
 
 It's a tiny command-line tool we've built at
 [Shiphero](http://shiphero.com) that lets you easily upload code
 snippets, notebooks, images, or any other file to a Github repository
 that acts as your internal pastebin, and returns the URL to share it
 with your team. If possible, this URL is automatically copied to the
-clipboard. 
+clipboard.
 
-# Why? 
+# Why?
 
 You want to share code snippets, images, notebooks, etc. with your team,
 probably privately. Gist is great, but it has some limitations:
 
 - The content may be secret but it is not private: if you have the url
-  you have the access (and to err is human). 
+  you have the access (and to err is human).
 - The ownership of the shared content is in the user's namespace, not
-  the organization's.  What happens if the user leaves the organization? 
+  the organization's. What happens if the user leaves the organization?
 - You can't find some secret content shared by a teammate if the URL is
   lost. Only the person who created it can find it, and even that isn't
-  easy if the content doesn't have a good name and description. 
+  easy if the content doesn't have a good name and description.
 - Content organization is difficult: you can upload multiple files to
   a gist, but you can't create folders.
 - The default gist interface does not allow you to "paste" an image (you
   can paste it as part of a comment, but not as part of the gist content
-  itself). Sharing screenshots is a common use case on computers. 
+  itself). Sharing screenshots is a common use case on computers.
 
 Using a full repository has all the advantages of Gist (rich content
 rendering like markdown or ipynb, every change is a git commit, etc.)
-without these limitations. 
+without these limitations.
 
 The only downside of a plain repository is that it is not as easy as
-"paste" the content, even when  editing through the Github interface.
-But `shbin` solves that. 
+"paste" the content, even when editing through the Github interface.
+But `shbin` solves that.
 
 # Usage
+
+Full video demo
+
+[https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg](https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg)
 
 ```console
 # upload or update a file
@@ -78,10 +82,10 @@ $ shbin -h   # show full options
 
 # How it works
 
-It uses [Github API](https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents)
+It
+uses [Github API](https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents)
 to create or update files in the given repo. So there is no need to
-have the target repository fully cloned locally.  
-
+have the target repository fully cloned locally.
 
 # Install
 
@@ -91,7 +95,7 @@ The recommended way is to use [pipx](https://pypa.github.io/pipx/)
 pipx install shbin 
 ```
 
-Alternatively, install directly with `pip`. 
+Alternatively, install directly with `pip`.
 
 ```console
 pip install --user shbin
@@ -104,17 +108,18 @@ pip install --user https://github.com/Shiphero/shbin/archive/refs/heads/main.zip
 ```
 
 ## OSX
-shbin depends on 
+
+shbin depends on
 [python-magic](https://github.com/ahupp/python-magic#osx). This can be
 installed as follows.
 
-- When using Homebrew: 
+- When using Homebrew:
 
 ```console
 brew install libmagic
 ```
 
-- When using macports: 
+- When using macports:
 
 ```console
 port install file
@@ -125,12 +130,12 @@ port install file
 Create a [new fine-grained personal token](https://github.com/settings/personal-access-tokens/new)
 on Github restricted to your "pastebin" repository (under your user or
 your organization's ownership), with read and write permissions on
-"Contents". 
+"Contents".
 
 ![image](https://user-images.githubusercontent.com/2355719/238758491-9d15e7e6-e4b7-43c8-a321-b65c968fc7e0.png)
 
 - Then set the environment variables in your preferred place:
-    
+
   ```
   export SHBIN_GITHUB_TOKEN="<your personal token>"
   export SHBIN_REPO="<user_or_org>/<repo>"   # example "Shiphero/pastebin"   
@@ -139,22 +144,26 @@ your organization's ownership), with read and write permissions on
 - By default `shbin` assigns a top-level folder to separate the content
   uploaded by each user. This can be changed using the `SHBIN_NAMESPACE`
   environment variable or the `--namespace` argument from the command
-  line. For example: 
+  line. For example:
 
-  - `export SHBIN_NAMESPACE=""`        # no namespace
-  - `export SHBIN_NAMESPACE="pastebin_folder"`  # the full pastebin is inside pastebin_folder/" 
-  - `export SHBIN_NAMESPACE="pastebin_folder/{user}"`   # mix of both: each user has its own subfolder inside `pastebin_folder/` 
+    - `export SHBIN_NAMESPACE=""`        # no namespace
+    - `export SHBIN_NAMESPACE="pastebin_folder"`  # the full pastebin is inside pastebin_folder/"
+    - `export SHBIN_NAMESPACE="pastebin_folder/{user}"`   # mix of both: each user has its own subfolder
+      inside `pastebin_folder/`
 
 - [optional] To interact with the clipboard, we use the library `pyclip`.
   This may require some additional system dependencies
-  depending your operating system. See [these notes](https://github.com/spyoungtech/pyclip#platform-specific-notesissues).
+  depending your operating system.
+  See [these notes](https://github.com/spyoungtech/pyclip#platform-specific-notesissues).
 
-  If you want to disable the automatic copying of the URL to the clipboard 
-  you can set the environment variable `SHBIN_COPY_URL=false` (or "0" or "no"). 
-  
+  If you want to disable the automatic copying of the URL to the clipboard
+  you can set the environment variable `SHBIN_COPY_URL=false` (or "0" or "no").
+
   This is useful in some Linux distributions that use Wayland as the call via `wl-copy`
-  that `pyclip` uses in such environment can be slow. 
+  that `pyclip` uses in such environment can be slow.
 
-
-
+Nice video courtesy of [tuterm](https://github.com/veracioux/tuterm), [asciinema](https://asciinema.org/)
+and [svg-term-cli](https://github.com/marionebl/svg-term-cli)
 PRs are welcome! 
+
+
