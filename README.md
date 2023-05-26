@@ -41,9 +41,7 @@ But `shbin` solves that.
 # Usage
 Full video demo
 
-<p align="center">
-  <img width="75%" src="https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg" />
-</p>
+[https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg](https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg)
 
 
 ```console
