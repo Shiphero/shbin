@@ -45,7 +45,6 @@ Full video demo
   <img width="75%" src="https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg" />
 </p>
 
-()[]
 
 ```console
 # upload or update a file
