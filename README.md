@@ -42,7 +42,7 @@ But `shbin` solves that.
 
 Full video demo
 
-[https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg](https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg)
+![https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg](https://raw.githubusercontent.com/Shiphero/pastebin/main/demo/usage.svg)
 
 ```console
 # upload or update a file
