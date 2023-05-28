@@ -1,0 +1,53 @@
+# file: > shbin_usage
+prompt() {
+  echo -ne "\033[1;35m\$ \033[0;33m"
+}
+configure() {
+  DELAY=0.02
+  DELAY_SEP=0.08
+  DELAY_PROMPT=0.6
+  COLOR_MESSAGE='1;32'
+}
+
+run() {
+  cd $(dirname $TUTERM_SCRIPT)
+  # export SHBIN_COPY_URL=false
+
+  M "upload or update a file"
+  c shbin demo.py
+
+  M "upload with a commit description"
+  c shbin demo_2.py -m \"my cool demo script\"
+
+  M "Upload content from the clipboard with a given filename"
+  echo "some awesome thing" | pyclip copy
+  c shbin -x -f my_snippet_2.md
+
+  M "By default, you'll get a random name with extension autodetected"
+  c shbin -x
+
+  M "Btw, you can pipe stdin directly to shbin"
+  echo some content | shbin -
+
+  M "Download a given file (inside the namespace)"
+  c shbin dl alvarmaciel/my_snippet_2.md
+
+  c cat my_snippet_2.md
+
+  M "update the content of a file that already exists"
+  echo "some awesome new content" >>my_snippet_2.md
+  c shbin my_snippet_2.md
+
+  M "upload the content with a given name to a directory in your user directory"
+  c cat demo.py | pyclip copy
+  c shbin -x -f the_coolest_thing.py -d demo/coolest_things/python
+
+  M "upload several files in a directory"
+  c shbin *.py *.sh -d demo/notebooks/project -m \"my new work\"
+
+  M "Reformat the URL to link to Github pages."
+  c shbin demo_3.py -p
+
+  M "show full options"
+  c shbin -h
+}
