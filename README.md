@@ -42,7 +42,11 @@ But `shbin` solves that.
 
 Full video demo
 
-![https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg](https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg)
+<p align="center">
+  <a href="https://asciinema.org/a/588631" target="_blank">
+    <img width="50%" src="https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg" />
+  </a>
+</p>
 
 ```console
 # upload or update a file
