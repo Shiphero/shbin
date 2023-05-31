@@ -30,6 +30,7 @@ dynamic = ["version", "description"]
 
 [project.urls]
 Home = "https://github.com/Shiphero/shbin"
+Changelog = "https://github.com/Shiphero/shbin/main/CHANGELOG.md"
 
 [project.scripts]
 shbin = "shbin:main"
