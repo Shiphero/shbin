@@ -4,50 +4,51 @@ prompt() {
 }
 configure() {
   DELAY=0.02
-  DELAY_SEP=0.08
-  DELAY_PROMPT=0.6
+  DELAY_PROMPT=0.2
   COLOR_MESSAGE='1;32'
 }
 
 run() {
   cd $(dirname $TUTERM_SCRIPT)
   # export SHBIN_COPY_URL=false
-
-  M "upload or update a file"
+  
+  M "Upload or update a file"
   c shbin demo.py
 
-  M "upload with a commit description"
+  M "Add a commit description"
   c shbin demo_2.py -m \"my cool demo script\"
 
-  M "Upload content from the clipboard with a given filename"
+  M "Paste from the clipboard (format autodetected)"
   echo "some awesome thing" | pyclip copy
-  c shbin -x -f my_snippet_2.md
-
-  M "By default, you'll get a random name with extension autodetected"
   c shbin -x
 
-  M "Btw, you can pipe stdin directly to shbin"
+  M "From the clipboard, but give it a name"
+  c shbin -x -f my_snippet_2.md
+
+  M "Pipe stdin directly to shbin"
   echo some content | shbin -
 
+  sleep 2
+  clear
   M "Download a given file (inside the namespace)"
   c shbin dl alvarmaciel/my_snippet_2.md
-
   c cat my_snippet_2.md
 
   M "update the content of a file that already exists"
   echo "some awesome new content" >>my_snippet_2.md
   c shbin my_snippet_2.md
 
-  M "upload the content with a given name to a directory in your user directory"
+  M "Upload to a directory in the pastebin (under namespace)"
   c cat demo.py | pyclip copy
-  c shbin -x -f the_coolest_thing.py -d demo/coolest_things/python
+  c shbin -x -f thing.py -d coolest_things/python
 
   M "upload several files in a directory"
-  c shbin *.py *.sh -d demo/notebooks/project -m \"my new work\"
+  c shbin *.py *.sh -d notebooks/project -m \"my new work\"
 
-  M "Reformat the URL to link to Github pages."
+  M "Upload an get the link to Github pages"
   c shbin demo_3.py -p
 
-  M "show full options"
+  M "Full options"
   c shbin -h
+  sleep 2
 }
