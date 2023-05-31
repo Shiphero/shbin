@@ -12,6 +12,12 @@ that acts as your internal pastebin, and returns the URL to share it
 with your team. If possible, this URL is automatically copied to the
 clipboard.
 
+<p align="center">
+  <a href="https://asciinema.org/a/588725" target="_blank">
+    <img width="90%" src="https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg" />
+  </a>
+</p>
+
 # Why?
 
 You want to share code snippets, images, notebooks, etc. with your team,
@@ -40,13 +46,6 @@ But `shbin` solves that.
 
 # Usage
 
-Full video Demo
-
-<p align="center">
-  <a href="https://asciinema.org/a/588725" target="_blank">
-    <img width="50%" src="https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg" />
-  </a>
-</p>
 
 ```console
 # upload or update a file
