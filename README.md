@@ -40,10 +40,10 @@ But `shbin` solves that.
 
 # Usage
 
-Full Demo
+Full video Demo
 
 <p align="center">
-  <a href="https://asciinema.org/a/588631" target="_blank">
+  <a href="https://asciinema.org/a/588725" target="_blank">
     <img width="50%" src="https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg" />
   </a>
 </p>
