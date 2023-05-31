@@ -39,7 +39,9 @@ The only downside of a plain repository is that it is not as easy as
 But `shbin` solves that.
 
 # Usage
-[![asciicast](https://asciinema.org/a/588631.svg)](https://asciinema.org/a/588631)Full video demo
+<a href="https://asciinema.org/a/588631" target="_blank"><img src="https://asciinema.org/a/588631.svg" /></a>
+
+Full Demo
 
 <p align="center">
   <a href="https://asciinema.org/a/588631" target="_blank">
