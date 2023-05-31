@@ -39,8 +39,7 @@ The only downside of a plain repository is that it is not as easy as
 But `shbin` solves that.
 
 # Usage
-<script async id="asciicast-588631" src="https://asciinema.org/a/588631.js"></script>
-Full video demo
+[![asciicast](https://asciinema.org/a/588631.svg)](https://asciinema.org/a/588631)Full video demo
 
 <p align="center">
   <a href="https://asciinema.org/a/588631" target="_blank">
