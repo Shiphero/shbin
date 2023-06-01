@@ -7,15 +7,13 @@
 
 It's a tiny command-line tool we've built at
 [Shiphero](http://shiphero.com) that lets you easily upload code
-snippets, notebooks, images, or any other file to a Github repository
+snippets, notebooks, images or any other content to a Github repository
 that acts as your internal pastebin, and returns the URL to share it
 with your team. If possible, this URL is automatically copied to the
 clipboard.
 
 <p align="center">
-  <a href="https://asciinema.org/a/588725" target="_blank">
     <img width="90%" src="https://raw.githubusercontent.com/Shiphero/shbin/main/demo/usage.svg" />
-  </a>
 </p>
 
 # Why?
