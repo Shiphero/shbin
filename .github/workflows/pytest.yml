@@ -28,14 +28,14 @@ jobs:
           pip install -e .[dev]
       - name: Build coverage file
         run: |
-          pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=tests | tee pytest-coverage.txt
+          pytest --cov-report "xml:coverage.xml" --cov=src tests/
 
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
           hide-report: false
-          pytest-coverage-path: pytest-coverage.txt
-          junitxml-path: pytest.xml
+          pytest-xml-coverage-path: ./coverage.xml
+          junitxml-path: ./pytest.xml
       - name: Check the output coverage
         run: |
           echo "Coverage Percantage - ${{ steps.coverageComment.outputs.coverage }}"
