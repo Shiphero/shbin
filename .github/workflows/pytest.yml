@@ -28,7 +28,7 @@ jobs:
           pip install -e .[dev]
       - name: Test with pytest
         run: |
-          pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=./tests | tee pytest-coverage.txt
+          pytest --junitxml=pytest.xml --cov-report "xml:coverage.xml" --cov=./tests
       - name: Build coverage file
         run: |
           pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
@@ -36,7 +36,7 @@ jobs:
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
-          pytest-coverage-path: ./tests/pytest-coverage.txt
+          pytest-coverage-path: ./tests/coverage.xml
           junitxml-path: ./pytest.xml
       - name: Check the output coverage
         run: |
