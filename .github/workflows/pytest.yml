@@ -28,7 +28,7 @@ jobs:
           pip install -e .[dev]
       - name: Build coverage file
         run: |
-          pytest --cov-report "xml:coverage.xml" --cov=src tests/
+          pytest --cov-report "xml:coverage.xml" --cov=tests
 
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
