@@ -2,7 +2,7 @@ name: tests
 on:
   pull_request:
     branches:
-    - main
+    - '*'
   push:
     branches:
     - main
@@ -33,6 +33,6 @@ jobs:
       - name: Pytest coverage comment
         uses: MishaKav/pytest-coverage-comment@main
         with:
-          hide-reporte: false
+          hide-report: false
           pytest-coverage-path: ./tests/pytest-coverage.txt
-          junitxml-path: ./pytest.xml
+          junitxml-path: ./tests/pytest.xml
