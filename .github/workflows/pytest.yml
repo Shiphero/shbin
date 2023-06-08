@@ -34,8 +34,8 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@main
         with:
           hide-report: false
-          pytest-xml-coverage-path: ./coverage.xml
-          junitxml-path: ./pytest.xml
+          pytest-xml-coverage-path: coverage.xml
+          junitxml-path: pytest.xml
       - name: Check the output coverage
         run: |
           echo "Coverage Percantage - ${{ steps.coverageComment.outputs.coverage }}"
