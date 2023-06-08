@@ -38,7 +38,7 @@ shbin = "shbin:main"
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "black"
+    "black",
     "pytest-cov",
     "flake8",
 ]
