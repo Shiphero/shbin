@@ -39,6 +39,8 @@ shbin = "shbin:main"
 dev = [
     "pytest",
     "black"
+    "pytest-cov",
+    "flake8",
 ]
 
 [tool.black]
