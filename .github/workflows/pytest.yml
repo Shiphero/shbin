@@ -2,7 +2,7 @@ name: tests
 on:
   pull_request:
     branches:
-    - main
+    - '*'
   push:
     branches:
     - main
@@ -26,6 +26,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .[dev]
-      - name: Test with pytest
+      - name: Build coverage file
         run: |
-          pytest
+          pytest --junitxml=pytest.xml --cov-report "xml:coverage.xml" --cov=shbin tests/
+
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          hide-report: false
+          pytest-xml-coverage-path: coverage.xml
+          junitxml-path: pytest.xml
+      - name: Check the output coverage
+        run: |
+          echo "Coverage Percantage - ${{ steps.coverageComment.outputs.coverage }}"
+          echo "Coverage Color - ${{ steps.coverageComment.outputs.color }}"
+          echo "Coverage Html - ${{ steps.coverageComment.outputs.coverageHtml }}"
+          echo "Summary Report - ${{ steps.coverageComment.outputs.summaryReport }}"
+          
+          echo "Coverage Warnings - ${{ steps.coverageComment.outputs.warnings }}"
+
+          echo "Coverage Errors - ${{ steps.coverageComment.outputs.errors }}"
+          echo "Coverage Failures - ${{ steps.coverageComment.outputs.failures }}"
+          echo "Coverage Skipped - ${{ steps.coverageComment.outputs.skipped }}"
+          echo "Coverage Tests - ${{ steps.coverageComment.outputs.tests }}"
+          echo "Coverage Time - ${{ steps.coverageComment.outputs.time }}"
+          echo "Not Success Test Info - ${{ steps.coverageComment.outputs.notSuccessTestInfo }}"
