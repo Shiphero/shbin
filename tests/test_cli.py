@@ -32,6 +32,7 @@ def repo():
     repo = create_autospec(Repository, name="gh_repo")
     repo.create_file.return_value = {"content": Mock(html_url="https://the-url")}
     repo.update_file.return_value = {"content": Mock(html_url="https://the-url-updated")}
+    repo.full_name = 'my_awesome/repository'
     return repo
 
 
@@ -320,7 +321,19 @@ def test_force_new(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
     assert capsys.readouterr().out == "🔗📋 https://the-url-2\n"
 
 
-def test_download_a_file(tmp_path, patched_repo_and_user, repo):
+def test_download_a_file_from_owned_repo(tmp_path, patched_repo_and_user, repo):
+    import ipdb;ipdb.set_trace()
+    git_data = {
+        "decoded_content": b"awesome content",
+    }
+    repo.get_contents.return_value = create_github_downloable_files(git_data)
+    working_dir = tmp_path / "working_dir"
+    working_dir.mkdir()
+    os.chdir(working_dir)
+    main(["dl", "hello.md"])
+    assert (working_dir / "hello.md").read_bytes() == b"awesome content"
+
+def test_download_a_file_from_public_repo(tmp_path, patched_repo_and_user, repo):
     git_data = {
         "decoded_content": b"awesome content",
     }
