@@ -123,6 +123,7 @@ def download(url_or_path, repo, user):
     if result:
         full_name_repo = result[0][0]
 
+
     is_from_my_repo = True if "https://" not in url_or_path or full_name_repo==repo.full_name else False
     if is_from_my_repo:
         path = re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path)
@@ -147,10 +148,12 @@ def download(url_or_path, repo, user):
             url = f"https://raw.githubusercontent.com/{repo.full_name}/{path}"
             response = requests.get(url)
             if response.status_code > 200:
-                raise GithubException
+                raise Exception("There was a problem with your download, please check url")
             content = response.content
     except GithubException:
         print("[red]x[/red] content not found")
+    except Exception as e:
+        print(f"[red]x[/red] {e}")
     else:
         target = pathlib.Path(path).name
         pathlib.Path(target).write_bytes(content)
