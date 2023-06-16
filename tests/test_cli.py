@@ -80,7 +80,7 @@ def patched_repo_and_user(repo):
 
 @pytest.fixture
 def patched_another_repo_and_user(outside_repo):
-    with patch("shbin.get_repo", return_value=(outside_repo)) as mocked:
+    with patch("shbin.get_repo", return_value=outside_repo) as mocked:
         yield mocked
 
 
