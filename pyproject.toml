@@ -41,6 +41,7 @@ dev = [
     "black",
     "pytest-cov",
     "flake8",
+    "requests_mock"
 ]
 
 [tool.black]
