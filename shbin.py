@@ -60,9 +60,11 @@ def get_repo_and_user():
     gh = Github(os.environ["SHBIN_GITHUB_TOKEN"])
     return gh.get_repo(os.environ["SHBIN_REPO"]), gh.get_user().login
 
+
 def get_repo(full_name_repo):
     gh = Github(os.environ["SHBIN_GITHUB_TOKEN"])
     return gh.get_repo(full_name_repo)
+
 
 def get_path(url):
     pattern = r"https://github.com/.*?/(?:tree|blob)/(.*)"
@@ -71,11 +73,7 @@ def get_path(url):
         extracted_string = result[0]
         return extracted_string
     else:
-        raise DocoptExit(
-            f"Ensure your path is from github repository. (error {e})"
-        )
-
-
+        raise DocoptExit(f"Ensure your path is from github repository. (error {e})")
 
 
 def expand_paths(path_or_patterns):
@@ -164,7 +162,9 @@ def main(argv=None) -> None:
     try:
         repo, user = get_repo_and_user()
     except Exception as e:
-        raise DocoptExit(f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})")
+        raise DocoptExit(
+            f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
+        )
     # resolves namespace + target-dir (without ending slash)
     # it also interpolates {user}
     namespace = args.get("--namespace")
