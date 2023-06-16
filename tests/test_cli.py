@@ -356,8 +356,10 @@ def test_download_a_file_from_public_repo(tmp_path, patched_another_repo_and_use
     main(["dl", "https://github.com/another_awesome/repository/blob/main/hello.md"])
     assert (working_dir / "hello.md").read_bytes() == b"awesome content"
 
-def test_download_a_file_from_public_repo_rasie_error(tmp_path, patched_another_repo_and_user, outside_repo, requests_mock,
-                                          patched_repo_and_user):
+
+def test_download_a_file_from_public_repo_rasie_error(tmp_path, patched_another_repo_and_user, outside_repo,
+                                                      requests_mock,
+                                                      patched_repo_and_user):
     requests_mock.get('https://raw.githubusercontent.com/another_awesome/repository/main/hello.md',
                       status_code=400)
     working_dir = tmp_path / "working_dir"
@@ -367,3 +369,4 @@ def test_download_a_file_from_public_repo_rasie_error(tmp_path, patched_another_
     with pytest.raises(Exception) as exc_info:
         raise Exception('There was a problem with your download, please check url')
     assert str(exc_info.value) == 'There was a problem with your download, please check url'
+   
