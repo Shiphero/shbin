@@ -164,9 +164,7 @@ def main(argv=None) -> None:
     try:
         repo, user = get_repo_and_user()
     except Exception as e:
-        raise DocoptExit(
-            f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
-        )
+        raise DocoptExit(f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})")
     # resolves namespace + target-dir (without ending slash)
     # it also interpolates {user}
     namespace = args.get("--namespace")
