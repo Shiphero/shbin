@@ -119,9 +119,15 @@ def download(url_or_path, repo, user):
     """
     full_name_repo = repo.full_name
     pattern = r"https://github.com/(.*?)/(tree|blob)/"
-    result = re.findall(pattern, url_or_path)
-    if result:
-        full_name_repo = result[0][0]
+    try:
+        result = re.findall(pattern, url_or_path)
+        if result:
+            full_name_repo = result[0][0]
+        else:
+            raise ValueError(f"The URL is not from a public repository on GitHub")
+    except ValueError as ve:
+        print(f"[red]x[/red] {ve}")
+        return
 
 
     is_from_my_repo = True if "https://" not in url_or_path or full_name_repo==repo.full_name else False
