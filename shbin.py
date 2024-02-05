@@ -7,12 +7,15 @@ import pathlib
 import re
 import secrets
 import sys
+import time
 from mimetypes import guess_extension
+
 
 import pyclip
 from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
+import requests
 
 usage = """
 
@@ -102,9 +105,30 @@ def normalize_path(url_or_path, repo):
 def run(url_or_path, repo, user):
     path = normalize_path(url_or_path, repo)
     wf = repo.get_workflow("run_script.yml")
-    result = wf.create_dispatch(repo.default_branch, {"file_path": path})
-    print(result)
-    
+    wf.create_dispatch(repo.default_branch, {"file_path": path})
+    while True:
+        run = wf.get_runs(user, repo.default_branch, event="workflow_dispatch")[0]
+        print(run.status)
+        if run.status == "in_progress":
+            job = run.jobs()[0]
+            break        
+        time.sleep(1)
+        continue
+            
+    print(job.html_url)
+    url = job.logs_url()
+    sentinel = "Cleaning up orphan processes"  # determines the logs is finished
+    seen = 0
+    while True:
+        response = requests.get(url)
+        lines = response.text.splitlines()
+        new_lines = lines[seen:]
+        seen = len(lines)
+        for line in new_lines:
+            print(line)
+        if sentinel in line:
+            break
+            
 
 def download(url_or_path, repo, user):
     """

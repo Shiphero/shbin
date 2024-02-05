@@ -1,0 +1,29 @@
+name: Shbin Run Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      file_path:
+        description: 'Relative path of the Python script to run'
+        required: true
+        type: string
+
+jobs:
+  run-script:
+    env:
+      SHBIN_GITHUB_TOKEN: ${{ secrets.github_token }}
+      SHBIN_REPO: ${{ github.repository }}
+      SHBIN_FORCE_USER: ${{ github.actor }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install shbin 
+      run: pip install https://github.com/Shiphero/shbin/archive/refs/heads/gha.zip
+    - name: Download script
+      run: shbin dl ${{ inputs.file_path }}
+    - name: Run Python script
+      run: |
+        python $(basename "${{ inputs.file_path }}") > output.txt
+    - name: Upload results
+      run: |
+        rm $(basename "${{ inputs.file_path }}")
+        shbin ./* -d ${{ inputs.file_path }}_run_${{ github.run_id }}
