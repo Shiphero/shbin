@@ -18,6 +18,7 @@ usage = """
 
 Usage:
   shbin dl <url_or_path>  
+  shbin run <url_or_path>
   shbin (<path>... | -x | -) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
         [--namespace=<namespace>] [--url-link-to-pages]
   shbin (-h | --help)
@@ -88,6 +89,17 @@ def get_extension(content):
     else:
         return guess_extension(magic.from_buffer(content, mime=True))
 
+def normalize_path(url_or_path, repo):
+    return re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path).rstrip("/")
+
+
+def run(url_or_path, repo, user):
+    path = normalize_path(url_or_path, repo)
+    wf = repo.get_workflow("run_script.yml")
+    wf_run = wf.create_dispatch(repo.default_branch, {"file_path": path})
+    import ipdb;ipdb.set_trace()
+    print(result)
+    
 
 def download(url_or_path, repo, user):
     """
@@ -99,8 +111,7 @@ def download(url_or_path, repo, user):
     $ shbin dl https://github.com/Shiphero/pastebin/blob/main/bibo/AWS_API_fullfilment_methods/
     $ shbin dl bibo/AWS_API_fullfilment_methods/
     """
-    path = re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path)
-    path = path.rstrip("/")
+    path = normalize_path(url_or_path, repo)
     try:
         content = repo.get_contents(path)
         if isinstance(content, list):
@@ -113,6 +124,10 @@ def download(url_or_path, repo, user):
         else:
             content = content.decoded_content
     except GithubException:
+        if not path.startswith(f"{user}/"):
+            new_path = f"{user}/{path}"
+            print(f"[yellow]trying {new_path}")
+            return download(new_path, repo, user)
         print("[red]x[/red] content not found")
     else:
         target = pathlib.Path(path).name
@@ -139,7 +154,8 @@ def main(argv=None) -> None:
 
     if args["dl"]:
         return download(args["<url_or_path>"], repo, user)
-
+    elif args["run"]:
+        return run(args["<url_or_path>"], repo, user)
     elif args["--from-clipboard"] or args["<path>"] == ["-"]:
         if args["--from-clipboard"]:
             try:
