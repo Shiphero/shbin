@@ -111,7 +111,6 @@ def run(url_or_path, repo, user, show_logs=True, command="auto"):
     wf = repo.get_workflow("run_script.yml")
 
     if command == "auto":
-        import ipdb;ipdb.set_trace()
         executables = {"py": "python", "sh": "bash", "js": "node", "rb": "ruby", "php": "php", "go": "go run"}
         extension = path.rpartition(".")[-1]
         try:
