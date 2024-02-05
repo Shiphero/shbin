@@ -3,8 +3,13 @@ name: Shbin Run Script
 on:
   workflow_dispatch:
     inputs:
+      command:
+        description: 'Command to use'
+        required: true
+        type: string
+
       file_path:
-        description: 'Relative path of the Python script to run'
+        description: 'Relative path of the script to run'
         required: true
         type: string
 
@@ -20,9 +25,8 @@ jobs:
       run: pip install https://github.com/Shiphero/shbin/archive/refs/heads/gha.zip
     - name: Download script
       run: shbin dl ${{ inputs.file_path }}
-    - name: Run Python script
-      run: |
-        python $(basename "${{ inputs.file_path }}") > output.txt
+    - name: Run script
+      run: ${{ inputs.command}} $(basename "${{ inputs.file_path }}") > output.txt
     - name: Upload results
       run: |
         rm $(basename "${{ inputs.file_path }}")

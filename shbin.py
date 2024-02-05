@@ -21,7 +21,7 @@ usage = """
 
 Usage:
   shbin dl <url_or_path>  
-  shbin run <url_or_path>
+  shbin run [--logs] [--command=<command>] <url_or_path>
   shbin (<path>... | -x | -) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
         [--namespace=<namespace>] [--url-link-to-pages]
   shbin (-h | --help)
@@ -36,6 +36,7 @@ Options:
   -d <target-dir>, --target-dir=<target-dir>        Optional (sub)directory to upload file/s. 
   --namespace=<namespace>                           Base namespace to upload. Default to
                                                     SHBIN_NAMESPACE envvar or "{user}/". 
+  --command=<command>                               How to run the given file. Default "auto".
   -p, --url-link-to-pages                           Reformat the url to link to Github pages. 
 """
 
@@ -98,37 +99,58 @@ def get_extension(content):
     else:
         return guess_extension(magic.from_buffer(content, mime=True))
 
+
 def normalize_path(url_or_path, repo):
-    return re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path).rstrip("/")
+    return re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path).rstrip(
+        "/"
+    )
 
 
-def run(url_or_path, repo, user):
+def run(url_or_path, repo, user, show_logs=True, command="auto"):
     path = normalize_path(url_or_path, repo)
     wf = repo.get_workflow("run_script.yml")
-    wf.create_dispatch(repo.default_branch, {"file_path": path})
+
+    if command == "auto":
+        import ipdb;ipdb.set_trace()
+        executables = {"py": "python", "sh": "bash", "js": "node", "rb": "ruby", "php": "php", "go": "go run"}
+        extension = path.rpartition(".")[-1]
+        try:
+            command = executables[extension]
+        except KeyError:
+            raise DocoptExit(f"Unknown command for .{extension} files")
+
+    wf.create_dispatch(repo.default_branch, {"file_path": path, "command": command})
     while True:
         run = wf.get_runs(user, repo.default_branch, event="workflow_dispatch")[0]
-        print(run.status)
         if run.status == "in_progress":
             job = run.jobs()[0]
-            break        
+            break
         time.sleep(1)
         continue
-            
-    print(job.html_url)
-    url = job.logs_url()
-    sentinel = "Cleaning up orphan processes"  # determines the logs is finished
-    seen = 0
-    while True:
-        response = requests.get(url)
-        lines = response.text.splitlines()
-        new_lines = lines[seen:]
-        seen = len(lines)
-        for line in new_lines:
-            print(line)
-        if sentinel in line:
-            break
-            
+
+    print(f"⚙️  {job.html_url}")
+
+    if show_logs:
+        url = job.logs_url()
+        sentinel = "Cleaning up orphan processes"  # determines the logs is finished
+        seen = 0
+        while True:
+            response = requests.get(url)
+            lines = response.text.splitlines()
+            new_lines = lines[seen:]
+            seen = len(lines)
+            for line in new_lines:
+                print(line)
+            if sentinel in line:
+                break
+    while job.status != "completed":
+        job.update()
+        time.sleep(1)
+
+    output = repo.get_contents(f"{user}/{path}_run_{run.id}/output.txt").decoded_content.decode("utf-8")
+    print(f"[green]Result:[/green]\n\n{output}")
+    print(f"More: shbin dl {path}_run_{run.id}")
+
 
 def download(url_or_path, repo, user):
     """
@@ -184,7 +206,7 @@ def main(argv=None) -> None:
     if args["dl"]:
         return download(args["<url_or_path>"], repo, user)
     elif args["run"]:
-        return run(args["<url_or_path>"], repo, user)
+        return run(args["<url_or_path>"], repo, user, args["--logs"], args["--command"])
     elif args["--from-clipboard"] or args["<path>"] == ["-"]:
         if args["--from-clipboard"]:
             try:
