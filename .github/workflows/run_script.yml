@@ -1,4 +1,4 @@
-name: Shbin Run Script
+name: shbin run
 
 on:
   workflow_dispatch:

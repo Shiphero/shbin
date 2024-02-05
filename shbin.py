@@ -108,7 +108,12 @@ def normalize_path(url_or_path, repo):
 
 def run(url_or_path, repo, user, show_logs=True, command="auto"):
     path = normalize_path(url_or_path, repo)
-    wf = repo.get_workflow("run_script.yml")
+    try:
+        wf = repo.get_workflow("run_script.yml")
+    except GithubException:
+        print("[bold].github/workflows/run_script.yml[/bold] doesn't exist in your repo.")
+        print("Setup as 🔗 https://github.com/Shiphero/shbin/.github/workflows/run_script.yml")
+        return
 
     if command == "auto":
         executables = {"py": "python", "sh": "bash", "js": "node", "rb": "ruby", "php": "php", "go": "go run"}
@@ -136,7 +141,7 @@ def run(url_or_path, repo, user, show_logs=True, command="auto"):
         while True:
             response = requests.get(url)
             lines = response.text.splitlines()
-            new_lines = lines[seen:]
+            new_lines = lines[seen:]    # only print new lines
             seen = len(lines)
             for line in new_lines:
                 print(line)
@@ -148,7 +153,7 @@ def run(url_or_path, repo, user, show_logs=True, command="auto"):
 
     output = repo.get_contents(f"{user}/{path}_run_{run.id}/output.txt").decoded_content.decode("utf-8")
     print(f"[green]Result:[/green]\n\n{output}")
-    print(f"More: shbin dl {path}_run_{run.id}")
+    print(f"[green]More at:[/green]\n\n  shbin dl {path}_run_{run.id}")
 
 
 def download(url_or_path, repo, user):
