@@ -58,7 +58,13 @@ class FakePath:
 
 def get_repo_and_user():
     gh = Github(os.environ["SHBIN_GITHUB_TOKEN"])
-    return gh.get_repo(os.environ["SHBIN_REPO"]), gh.get_user().login
+    try:
+        user = gh.get_user().login
+    except GithubException:
+        user = os.environ.get("SHBIN_FORCE_USER")
+        if not user:
+            raise
+    return gh.get_repo(os.environ["SHBIN_REPO"]), user
 
 
 def expand_paths(path_or_patterns):
@@ -96,8 +102,7 @@ def normalize_path(url_or_path, repo):
 def run(url_or_path, repo, user):
     path = normalize_path(url_or_path, repo)
     wf = repo.get_workflow("run_script.yml")
-    wf_run = wf.create_dispatch(repo.default_branch, {"file_path": path})
-    import ipdb;ipdb.set_trace()
+    result = wf.create_dispatch(repo.default_branch, {"file_path": path})
     print(result)
     
 
