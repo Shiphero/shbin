@@ -40,7 +40,7 @@ Options:
   -p, --url-link-to-pages                           Reformat the url to link to Github pages. 
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0a1"
 
 
 class FakePath:
