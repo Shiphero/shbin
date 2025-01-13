@@ -42,8 +42,11 @@ The only downside of a plain repository is that it is not as easy as
 "paste" the content, even when editing through the Github interface.
 But `shbin` solves that.
 
-# Usage
+Sound good? Give us a star and share it! 
 
+[![Sparkline](https://stars.medv.io/shiphero/shbin.svg)](https://stars.medv.io/shiphero/shbin)
+
+# Usage
 
 ```console
 # upload or update a file
