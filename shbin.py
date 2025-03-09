@@ -7,6 +7,7 @@ import pathlib
 import re
 import secrets
 import sys
+import requests
 from mimetypes import guess_extension
 
 import pyclip
@@ -60,6 +61,21 @@ def get_repo_and_user():
     return gh.get_repo(os.environ["SHBIN_REPO"]), gh.get_user().login
 
 
+def get_repo(full_name_repo):
+    gh = Github(os.environ["SHBIN_GITHUB_TOKEN"])
+    return gh.get_repo(full_name_repo)
+
+
+def get_path(url):
+    pattern = r"https://github.com/.*?/(?:tree|blob)/(.*)"
+    result = re.findall(pattern, url)
+    if result:
+        extracted_string = result[0]
+        return extracted_string
+    else:
+        raise DocoptExit(f"Ensure your path is from github repository. (error {e})")
+
+
 def expand_paths(path_or_patterns):
     """
     receive a list of relative paths or glob patterns and return an iterator of Path instances
@@ -99,21 +115,42 @@ def download(url_or_path, repo, user):
     $ shbin dl https://github.com/Shiphero/pastebin/blob/main/bibo/AWS_API_fullfilment_methods/
     $ shbin dl bibo/AWS_API_fullfilment_methods/
     """
-    path = re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path)
+    full_name_repo = repo.full_name
+    pattern = r"https://github.com/(.*?)/(tree|blob)/"
+    result = re.findall(pattern, url_or_path)
+    if result:
+        full_name_repo = result[0][0]
+
+    is_from_my_repo = "https://" not in url_or_path or full_name_repo == repo.full_name
+    if is_from_my_repo:
+        path = re.sub(rf"^https://github\.com/{repo.full_name}/(blob|tree)/{repo.default_branch}/", "", url_or_path)
+    else:
+        repo = get_repo(full_name_repo)
+        path = get_path(url_or_path)
+
     path = path.rstrip("/")
     try:
-        content = repo.get_contents(path)
-        if isinstance(content, list):
-            # FIXME currently this will flatten the tree:
-            # suposse dir/foo.py and dir/subdir/bar.py
-            # Then `$ shbin dl dir` will get foo.py and bar.py in the same dir.
-            for content_file in content:
-                download(content_file.path, repo, user)
-            return
+        if is_from_my_repo:
+            content = repo.get_contents(path)
+            if isinstance(content, list):
+                # FIXME currently this will flatten the tree:
+                # suposse dir/foo.py and dir/subdir/bar.py
+                # Then `$ shbin dl dir` will get foo.py and bar.py in the same dir.
+                for content_file in content:
+                    download(content_file.path, repo, user)
+                return
+            else:
+                content = content.decoded_content
         else:
-            content = content.decoded_content
+            url = f"https://raw.githubusercontent.com/{repo.full_name}/{path}"
+            response = requests.get(url)
+            if response.status_code > 200:
+                raise Exception("There was a problem with your download, please check url")
+            content = response.content
     except GithubException:
         print("[red]x[/red] content not found")
+    except Exception as e:
+        print(f"[red]x[/red] {e}")
     else:
         target = pathlib.Path(path).name
         pathlib.Path(target).write_bytes(content)

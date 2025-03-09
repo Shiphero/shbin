@@ -32,7 +32,15 @@ def repo():
     repo = create_autospec(Repository, name="gh_repo")
     repo.create_file.return_value = {"content": Mock(html_url="https://the-url")}
     repo.update_file.return_value = {"content": Mock(html_url="https://the-url-updated")}
+    repo.full_name = "my_awesome/repository"
     return repo
+
+
+@pytest.fixture
+def outside_repo():
+    outside_repo = create_autospec(Repository, name="gh_repo")
+    outside_repo.full_name = "another_awesome/repository"
+    return outside_repo
 
 
 @pytest.fixture(autouse=True)
@@ -67,6 +75,12 @@ def stdin(monkeypatch):
 @pytest.fixture
 def patched_repo_and_user(repo):
     with patch("shbin.get_repo_and_user", return_value=(repo, "messi")) as mocked:
+        yield mocked
+
+
+@pytest.fixture
+def patched_another_repo_and_user(outside_repo):
+    with patch("shbin.get_repo", return_value=outside_repo) as mocked:
         yield mocked
 
 
@@ -320,7 +334,7 @@ def test_force_new(pyclip, tmp_path, patched_repo_and_user, repo, capsys):
     assert capsys.readouterr().out == "🔗📋 https://the-url-2\n"
 
 
-def test_download_a_file(tmp_path, patched_repo_and_user, repo):
+def test_download_a_file_from_owned_repo(tmp_path, patched_repo_and_user, repo):
     git_data = {
         "decoded_content": b"awesome content",
     }
@@ -330,3 +344,29 @@ def test_download_a_file(tmp_path, patched_repo_and_user, repo):
     os.chdir(working_dir)
     main(["dl", "hello.md"])
     assert (working_dir / "hello.md").read_bytes() == b"awesome content"
+
+
+def test_download_a_file_from_public_repo(
+    tmp_path, patched_another_repo_and_user, outside_repo, requests_mock, patched_repo_and_user
+):
+    requests_mock.get(
+        "https://raw.githubusercontent.com/another_awesome/repository/main/hello.md", content=b"awesome content"
+    )
+    working_dir = tmp_path / "working_dir"
+    working_dir.mkdir()
+    os.chdir(working_dir)
+    main(["dl", "https://github.com/another_awesome/repository/blob/main/hello.md"])
+    assert (working_dir / "hello.md").read_bytes() == b"awesome content"
+
+
+def test_download_a_file_from_public_repo_rasie_error(
+    tmp_path, patched_another_repo_and_user, outside_repo, requests_mock, patched_repo_and_user
+):
+    requests_mock.get("https://raw.githubusercontent.com/another_awesome/repository/main/hello.md", status_code=400)
+    working_dir = tmp_path / "working_dir"
+    working_dir.mkdir()
+    os.chdir(working_dir)
+    main(["dl", "https://github.com/another_awesome/repository/blob/main/hello.md"])
+    with pytest.raises(Exception) as exc_info:
+        raise Exception("There was a problem with your download, please check url")
+    assert str(exc_info.value) == "There was a problem with your download, please check url"
