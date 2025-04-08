@@ -90,22 +90,16 @@ have the target repository fully cloned locally.
 
 # Install
 
-The recommended way is to use [pipx](https://pypa.github.io/pipx/)
+The recommended way is to use [uv](https://docs.astral.sh/uv/)
 
 ```console
-pipx install shbin 
-```
-
-Alternatively, install directly with `pip`.
-
-```console
-pip install --user shbin
+uv tool install shbin 
 ```
 
 To install the latest development version from the repository:
 
 ```console
-pip install --user https://github.com/Shiphero/shbin/archive/refs/heads/main.zip
+uv tool install https://github.com/Shiphero/shbin/archive/refs/heads/main.zip
 ```
 
 ## OSX
@@ -128,43 +122,48 @@ port install file
 
 # Setup
 
-Create a [new fine-grained personal token](https://github.com/settings/personal-access-tokens/new)
+To authenticate, simply run:
+```
+shbin init
+```
+
+This command will guide you through creating a token and and selecting a repository, 
+then store them locally so that `shbin` can use them right away.
+
+Alternatively, you can **manually** create a  [new fine-grained personal token](https://github.com/settings/personal-access-tokens/new)
 on Github restricted to your "pastebin" repository (under your user or
-your organization's ownership), with read and write permissions on
-"Contents".
+your organization's ownership), with **read and write** permission on **Contents**:
 
 ![image](https://user-images.githubusercontent.com/2355719/238758491-9d15e7e6-e4b7-43c8-a321-b65c968fc7e0.png)
 
-- Then set the environment variables in your preferred place:
+Then set the environment variables:
 
   ```
   export SHBIN_GITHUB_TOKEN="<your personal token>"
-  export SHBIN_REPO="<user_or_org>/<repo>"   # example "Shiphero/pastebin"   
-   ```
+  export SHBIN_REPO="<user_or_org>/<repo>"   # example "myorg/pastebin"   
+  ```
 
-- By default `shbin` assigns a top-level folder to separate the content
-  uploaded by each user. This can be changed using the `SHBIN_NAMESPACE`
-  environment variable or the `--namespace` argument from the command
-  line. For example:
 
-    - `export SHBIN_NAMESPACE=""`        # no namespace
-    - `export SHBIN_NAMESPACE="pastebin_folder"`  # the full pastebin is inside pastebin_folder/"
-    - `export SHBIN_NAMESPACE="pastebin_folder/{user}"`   # mix of both: each user has its own subfolder
-      inside `pastebin_folder/`
+By default `shbin` assigns a top-level folder to separate the content
+uploaded by each user. This can be changed using the `SHBIN_NAMESPACE`
+environment variable or the `--namespace` argument from the command
+line. For example:
 
-- [optional] To interact with the clipboard, we use the library `pyclip`.
-  This may require some additional system dependencies
-  depending your operating system.
-  See [these notes](https://github.com/spyoungtech/pyclip#platform-specific-notesissues).
+  - `export SHBIN_NAMESPACE=""`        # no namespace
+  - `export SHBIN_NAMESPACE="pastebin_folder"`  # the full pastebin is inside pastebin_folder/"
+  - `export SHBIN_NAMESPACE="pastebin_folder/{user}"`   # mix of both: each user has its own subfolder
+    inside `pastebin_folder/`
 
-  If you want to disable the automatic copying of the URL to the clipboard
-  you can set the environment variable `SHBIN_COPY_URL=false` (or "0" or "no").
+> [!NOTE] 
+> To interact with the clipboard, we use the library `pyclip`. This may require some additional system
+> dependencies depending your operating system. See [these notes](https://github.com/spyoungtech/pyclip#platform-specific-notesissues).
+> If you want to disable the automatic copying of the URL to the clipboard
+> you can set the environment variable `SHBIN_COPY_URL=false` (or "0" or "no").
+>
+> This is useful in some Linux distributions that use Wayland as the call via `wl-copy`
+> that `pyclip` uses in such environment can be slow.
 
-  This is useful in some Linux distributions that use Wayland as the call via `wl-copy`
-  that `pyclip` uses in such environment can be slow.
-
-Nice video courtesy of [tuterm](https://github.com/veracioux/tuterm), [asciinema](https://asciinema.org/)
-and [svg-term-cli](https://github.com/marionebl/svg-term-cli)
+Nice video courtesy of [tuterm](https://github.com/veracioux/tuterm), [asciinema](https://asciinema.org/) and [svg-term-cli](https://github.com/marionebl/svg-term-cli)
 
 PRs are welcome! 
 

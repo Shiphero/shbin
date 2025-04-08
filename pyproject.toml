@@ -25,6 +25,7 @@ dependencies = [
     "python-magic >= 0.4.27",
     "docopt-ng >= 0.8.1",
     "rich >= 12.5",
+    "platformdirs>=4.3.6",
 ]
 dynamic = ["version", "description"]
 

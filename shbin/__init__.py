@@ -13,11 +13,14 @@ import pyclip
 from docopt import DocoptExit, docopt
 from github import Github, GithubException
 from rich import print
+from .auth import do_auth, load_config
+
 
 usage = """
 
 Usage:
   shbin dl <url_or_path>  
+  shbin auth
   shbin (<path>... | -x | -) [-f <file-name>] [-n] [-m <message>] [-d <target-dir>] 
         [--namespace=<namespace>] [--url-link-to-pages]
   shbin (-h | --help)
@@ -35,7 +38,8 @@ Options:
   -p, --url-link-to-pages                           Reformat the url to link to Github pages. 
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
+
 
 
 class FakePath:
@@ -56,8 +60,17 @@ class FakePath:
 
 
 def get_repo_and_user():
-    gh = Github(os.environ["SHBIN_GITHUB_TOKEN"])
-    return gh.get_repo(os.environ["SHBIN_REPO"]), gh.get_user().login
+    data = load_config()
+    token = os.getenv("SHBIN_GITHUB_TOKEN", data.get("token"))
+    repo = os.getenv("SHBIN_REPO", data.get("repo"))
+    if not token or not repo:
+        print(
+            "[red]x[/red] Missing SHBIN_GITHUB_TOKEN or SHBIN_REPO environment variables. "
+            "Run [bold]shbin auth[/bold] to authenticate."
+        )
+        return sys.exit(1)
+    gh = Github(token)
+    return gh.get_repo(repo), gh.get_user().login
 
 
 def expand_paths(path_or_patterns):
@@ -121,13 +134,15 @@ def download(url_or_path, repo, user):
 
 
 def main(argv=None) -> None:
+    
     args = docopt(__doc__ + usage, argv, version=__version__)
-    try:
-        repo, user = get_repo_and_user()
-    except Exception as e:
-        raise DocoptExit(
-            f"Ensure SHBIN_GITHUB_TOKEN and SHBIN_REPO environment variables are correctly set. (error {e})"
-        )
+    
+    if args["auth"]:
+        do_auth()
+        return
+    
+    repo, user = get_repo_and_user()
+    
     # resolves namespace + target-dir (without ending slash)
     # it also interpolates {user}
     namespace = args.get("--namespace")
