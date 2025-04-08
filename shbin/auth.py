@@ -71,9 +71,9 @@ def device_flow_auth(client_id, scopes):
         copied = " (already copied 📋!) "
     except pyclip.ClipboardSetupException:
         copied = " "
-    
+
     print(f"You will be redirected to Github now.\nWhen asked, paste the{copied}code:\n [yellow]{user_code}[/yellow]")
-    
+
     time.sleep(2)
     webbrowser.open(verification_uri)
 
@@ -92,9 +92,9 @@ def device_flow_auth(client_id, scopes):
             data={
                 "client_id": client_id,
                 "device_code": device_code,
-                "grant_type": "urn:ietf:params:oauth:grant-type:device_code"
+                "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             },
-            headers={"Accept": "application/json"}
+            headers={"Accept": "application/json"},
         )
         poll_resp.raise_for_status()
         js = poll_resp.json()
@@ -111,8 +111,7 @@ def device_flow_auth(client_id, scopes):
         else:
             print("[green]✓[/green] Got access token.")
             return js["access_token"]
-            
-            
+
 
 def do_auth():
     token = device_flow_auth(GITHUB_CLIENT_ID, GITHUB_SCOPES)

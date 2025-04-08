@@ -1,6 +1,7 @@
 """
 Turns a Github repo into a pastebin.
 """
+
 import itertools
 import os
 import pathlib
@@ -39,7 +40,6 @@ Options:
 """
 
 __version__ = "0.4.0"
-
 
 
 class FakePath:
@@ -134,15 +134,14 @@ def download(url_or_path, repo, user):
 
 
 def main(argv=None) -> None:
-    
     args = docopt(__doc__ + usage, argv, version=__version__)
-    
+
     if args["auth"]:
         do_auth()
         return
-    
+
     repo, user = get_repo_and_user()
-    
+
     # resolves namespace + target-dir (without ending slash)
     # it also interpolates {user}
     namespace = args.get("--namespace")
@@ -165,7 +164,7 @@ def main(argv=None) -> None:
             content = sys.stdin.buffer.read()
 
         if args["--file-name"]:
-            file_name = f'{args["--file-name"]}'
+            file_name = f"{args['--file-name']}"
         else:
             extension = get_extension(content)
             # TODO try autodectect extension via pygment if .txt was guessed.
