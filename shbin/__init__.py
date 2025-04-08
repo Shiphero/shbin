@@ -68,7 +68,7 @@ def get_repo_and_user():
             "[red]x[/red] Missing SHBIN_GITHUB_TOKEN or SHBIN_REPO environment variables. "
             "Run [bold]shbin auth[/bold] to authenticate."
         )
-        return sys.exit(1)
+        raise SystemExit(1)
     gh = Github(token)
     return gh.get_repo(repo), gh.get_user().login
 

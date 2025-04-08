@@ -43,6 +43,7 @@ line-length = 120
 dev = [
     "pytest",
     "pytest-cov",
+    "pytest-mock>=3.14.0",
     "ruff",
 ]
 
