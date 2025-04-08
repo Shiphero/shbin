@@ -15,6 +15,7 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Topic :: Communications :: File Sharing",
 ]
+requires-python = ">=3.8"
 authors = [
     {name = "Alvar Maciel", email = "alvar.maciel@shiphero.com"}, 
     {name = "Martín Gaitán", email = "marting@shiphero.com"}
@@ -36,13 +37,13 @@ Changelog = "https://github.com/Shiphero/shbin/blob/main/CHANGELOG.md"
 [project.scripts]
 shbin = "shbin:main"
 
-[project.optional-dependencies]
+[tool.ruff]
+line-length = 120
+
+[dependency-groups]
 dev = [
     "pytest",
     "pytest-cov",
+    "ruff",
 ]
-
-[tool.ruff]
-target-version = "py38"
-line-length = 120
 
