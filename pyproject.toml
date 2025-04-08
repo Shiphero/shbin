@@ -39,15 +39,8 @@ shbin = "shbin:main"
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "black",
     "pytest-cov",
-    "flake8",
 ]
-
-[tool.black]
-target-version = ["py38"]
-line-length = 120
-color = true
 
 [tool.ruff]
 target-version = "py38"
