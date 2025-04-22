@@ -93,21 +93,19 @@ def test_version(capsys):
     assert capsys.readouterr().out == f"{__version__}\n"
 
 
-def test_token_envvar_is_mandarory(monkeypatch):
+def test_token_is_mandarory(mocker, monkeypatch):
+    mocker.patch("shbin.load_config", return_value={})
     monkeypatch.delenv("SHBIN_GITHUB_TOKEN", raising=False)
-    with pytest.raises(DocoptExit) as e:
+    with pytest.raises(SystemExit):
         main(["foo.py"])
 
-    assert "Ensure SHBIN_GITHUB_TOKEN" in str(e.value)
 
-
-def test_repo_envvar_is_mandarory(monkeypatch):
+def test_repo_is_mandarory(mocker, monkeypatch):
+    mocker.patch("shbin.load_config", return_value={})
     monkeypatch.setenv("SHBIN_GITHUB_TOKEN", "123")
     monkeypatch.delenv("SHBIN_REPO", raising=False)
-    with pytest.raises(DocoptExit) as e:
+    with pytest.raises(SystemExit):
         main(["foo.py"])
-
-    assert "error 'SHBIN_REPO'" in str(e)
 
 
 def test_upload_file(tmp_path, patched_repo_and_user, repo, pyclip, capsys):

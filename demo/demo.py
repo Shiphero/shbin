@@ -1,1 +1,1 @@
-import this
+import this  # noqa

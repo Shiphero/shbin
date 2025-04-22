@@ -25,6 +25,7 @@ dependencies = [
     "python-magic >= 0.4.27",
     "docopt-ng >= 0.8.1",
     "rich >= 12.5",
+    "platformdirs>=4.3.6",
 ]
 dynamic = ["version", "description"]
 
@@ -35,20 +36,14 @@ Changelog = "https://github.com/Shiphero/shbin/blob/main/CHANGELOG.md"
 [project.scripts]
 shbin = "shbin:main"
 
-[project.optional-dependencies]
+[tool.ruff]
+line-length = 120
+
+[dependency-groups]
 dev = [
     "pytest",
-    "black",
     "pytest-cov",
-    "flake8",
+    "pytest-mock>=3.14.0",
+    "ruff",
 ]
-
-[tool.black]
-target-version = ["py38"]
-line-length = 120
-color = true
-
-[tool.ruff]
-target-version = "py38"
-line-length = 120
 
